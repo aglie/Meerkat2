@@ -1,0 +1,195 @@
+!*****************************************************************************
+! Example file XDS.INP for the MAR345 and MAR555 (X-ray Research).
+! Characters in a line to the right of an exclamation mark are comment.
+!*****************************************************************************
+ DETECTOR=MAR345  MINIMUM_VALID_PIXEL_VALUE=0  OVERLOAD=130000
+ DIRECTION_OF_DETECTOR_X-AXIS= 1.0 0.0 0.0
+ DIRECTION_OF_DETECTOR_Y-AXIS= 0.0 1.0 0.0 ! 0.0 cos(2theta) sin(2theta)
+ TRUSTED_REGION=0.0 0.99 !Relative radii limiting trusted detector region
+ ORGX=1249.71 ORGY=1255.47  !Detector origin (pixels).  ORGX=NX/2; ORGY=NY/2
+!UNTRUSTED_RECTANGLE= 570 1920  1469 2048  ! rectangle: X1 X2   Y1 Y2
+!UNTRUSTED_ELLIPSE=1150 1350    1150 1350  ! ellipse enclosed by X1 X2 Y1 Y2
+ ROFF=0.0 TOFF=0.0!Radial & tangential offset for spiral read-out scanners
+!File name, access, format of dark-current (non-Xray background) image
+!DARK_CURRENT_IMAGE=../images/blank.tif    !hardly ever used
+
+!MAXIMUM_NUMBER_OF_JOBS=4  !Speeds-up COLSPOT & INTEGRATE on a Linux-cluster
+!MAXIMUM_NUMBER_OF_PROCESSORS=4!<33;ignored by single cpu version of xds
+!MINUTE=0   !Maximum number of minutes to wait until data image must appears
+!TEST=1     !Test flag. 1,2 additional diagnostics and images
+
+!NX=number of fast pixels (along X); QX=length of an X-pixel (mm)
+!NY=number of slow pixels (along Y); QY=length of a  Y-pixel (mm)
+!For the MAR345 and MAR555, the number of detector pixels and their sizes 
+!are obtained from the image header. It is therefore unnecessary to
+!specify values for NX, NY, QX, QY.
+!NX=1200 NY=1200 QX=0.15 QY=0.15  !images  ???.mar1200 or ???.pck1200
+!NX=1600 NY=1600 QX=0.15 QY=0.15  !images  ???.mar1600 or ???.pck1600
+ NX=2000 NY=2000 QX=0.15 QY=0.15  !images  ???.mar2000 or ???.pck2000
+!NX=2300 NY=2300 QX=0.15 QY=0.15  !images  ???.mar2300 or ???.pck2300
+!NX=1800 NY=1800 QX=0.10 QY=0.10  !images  ???.mar1800 or ???.pck1800
+!NX=2400 NY=2400 QX=0.10 QY=0.10  !images  ???.mar2400 or ???.pck2400
+!NX=3000 NY=3000 QX=0.10 QY=0.10  !images  ???.mar3000 or ???.pck3000
+!NX=3450 NY=3450 QX=0.10 QY=0.10  !images  ???.mar3450 or ???.pck3450
+!NX=2560 NY=3072 QX=0.139 QY=0.139!for MAR555 images
+
+!AIR=0.001 !Air absorption coefficient of x-rays is computed by XDS by default
+
+!====================== JOB CONTROL PARAMETERS ===============================
+!JOB= XYCORR INIT COLSPOT IDXREF DEFPIX XPLAN INTEGRATE CORRECT
+JOB= IDXREF 
+!====================== GEOMETRICAL PARAMETERS ===============================
+!ORGX and ORGY are often close to the image center, i.e. ORGX=NX/2, ORGY=NY/2
+ ORGX=1005 ORGY=1005  !Detector origin (pixels).  ORGX=NX/2; ORGY=NY/2
+ DETECTOR_DISTANCE= 180.0   !(mm)
+
+ ROTATION_AXIS= 1.0 0.0 0.0
+ OSCILLATION_RANGE=0.25            !degrees (>0)
+
+ X-RAY_WAVELENGTH=0.75         !Angstroem
+ INCIDENT_BEAM_DIRECTION=0.0 0.0 1.0
+!FRACTION_OF_POLARIZATION=0.90 !default=0.5 for unpolarized beam
+ POLARIZATION_PLANE_NORMAL= 0.0 1.0 0.0
+
+!======================= CRYSTAL PARAMETERS =================================
+!SPACE_GROUP_NUMBER=96   !0 for unknown crystals; cell constants are ignored.
+!UNIT_CELL_CONSTANTS= 12.2 12.2 6.8  90 90 120
+
+! You may specify here the x,y,z components for the unit cell vectors if
+! known from a previous run using the same crystal in the same orientation
+!UNIT_CELL_A-AXIS=14.1
+!UNIT_CELL_B-AXIS=14.1
+!UNIT_CELL_C-AXIS=
+
+!Optional reindexing transformation to apply on reflection indices
+!REIDX=   0  0 -1  0  0 -1  0  0 -1  0  0  0
+
+!FRIEDEL'S_LAW=FALSE !Default is TRUE.
+
+!==================== SELECTION OF DATA IMAGES ==============================
+!Generic file name and format (optional) of data images
+ NAME_TEMPLATE_OF_DATA_FRAMES=../mar2000/diffuse_???.mar2000  ! MAR345
+
+ DATA_RANGE=1 513       !Numbers of first and last data image collected
+
+ BACKGROUND_RANGE=1 5  !Numbers of first and last data image for background
+
+!SPOT_RANGE=1 19       !First and last data image number for finding spots
+
+!==================== DATA COLLECTION STRATEGY (XPLAN) ======================
+!                       !!! Warning !!!
+! If you processed your data for a crystal with unknown cell constants and
+! space group symmetry, XPLAN will report the results for space group P1.
+
+!STARTING_ANGLE=  0.0      STARTING_FRAME=1
+!used to define the angular origin about the rotation axis.
+!Default:  STARTING_ANGLE=  0 at STARTING_FRAME=first data image
+
+!RESOLUTION_SHELLS=10 6 5 4 3 2 1.5 1.3 1.2
+
+!STARTING_ANGLES_OF_SPINDLE_ROTATION= 0 180 10
+
+!TOTAL_SPINDLE_ROTATION_RANGES=30.0 120 15
+
+!REFERENCE_DATA_SET= CK.HKL   !Name of a reference data set (optional)
+
+!====================== INDEXING PARAMETERS =================================
+!Never forget to check this, since the default 0 0 0 is almost always correct!
+!INDEX_ORIGIN= 0 0 0          ! used by "IDXREF" to add an index offset
+
+!Additional parameters for fine tuning that rarely need to be changed
+!INDEX_ERROR=0.05 INDEX_MAGNITUDE=8 INDEX_QUALITY=0.8
+!SEPMIN=6.0 CLUSTER_RADIUS=3
+!MAXIMUM_ERROR_OF_SPOT_POSITION=3.0
+!MAXIMUM_ERROR_OF_SPINDLE_POSITION=2.0
+!MINIMUM_FRACTION_OF_INDEXED_SPOTS=0.5
+
+!============== DECISION CONSTANTS FOR FINDING CRYSTAL SYMMETRY =============
+!Decision constants for detection of lattice symmetry (IDXREF, CORRECT)
+ MAX_CELL_AXIS_ERROR=0.03 ! Maximum relative error in cell axes tolerated
+ MAX_CELL_ANGLE_ERROR=2.0 ! Maximum cell angle error tolerated
+
+!Decision constants for detection of space group symmetry (CORRECT).
+!Resolution range for accepting reflections for space group determination in
+!the CORRECT step. It should cover a sufficient number of strong reflections.
+ TEST_RESOLUTION_RANGE=8.0 4.5
+ MIN_RFL_Rmeas= 50 ! Minimum #reflections needed for calculation of Rmeas
+ MAX_FAC_Rmeas=2.0 ! Sets an upper limit for acceptable Rmeas
+
+!================= PARAMETERS CONTROLLING REFINEMENTS =======================
+!REFINE(IDXREF)=BEAM AXIS ORIENTATION CELL !DISTANCE
+!REFINE(INTEGRATE)=!DISTANCE BEAM ORIENTATION CELL !AXIS
+!REFINE(CORRECT)=DISTANCE BEAM ORIENTATION CELL AXIS
+
+!================== CRITERIA FOR ACCEPTING REFLECTIONS ======================
+ VALUE_RANGE_FOR_TRUSTED_DETECTOR_PIXELS= 6000 30000 !Used by DEFPIX
+				   !for excluding shaded parts of the detector.
+
+ INCLUDE_RESOLUTION_RANGE=20.0 0.0 !Angstroem; used by DEFPIX,INTEGRATE,CORRECT
+
+!used by CORRECT to exclude ice-reflections
+!EXCLUDE_RESOLUTION_RANGE= 3.93 3.87 !ice-ring at 3.897 Angstrom
+!EXCLUDE_RESOLUTION_RANGE= 3.70 3.64 !ice-ring at 3.669 Angstrom
+!EXCLUDE_RESOLUTION_RANGE= 3.47 3.41 !ice-ring at 3.441 Angstrom
+!EXCLUDE_RESOLUTION_RANGE= 2.70 2.64 !ice-ring at 2.671 Angstrom
+!EXCLUDE_RESOLUTION_RANGE= 2.28 2.22 !ice-ring at 2.249 Angstrom
+!EXCLUDE_RESOLUTION_RANGE= 2.102 2.042 !ice-ring at 2.072 Angstrom - strong
+!EXCLUDE_RESOLUTION_RANGE= 1.978 1.918 !ice-ring at 1.948 Angstrom - weak
+!EXCLUDE_RESOLUTION_RANGE= 1.948 1.888 !ice-ring at 1.918 Angstrom - strong
+!EXCLUDE_RESOLUTION_RANGE= 1.913 1.853 !ice-ring at 1.883 Angstrom - weak
+!EXCLUDE_RESOLUTION_RANGE= 1.751 1.691 !ice-ring at 1.721 Angstrom - weak
+
+!MINIMUM_ZETA=0.15 !Defines width of 'blind region' (XPLAN,INTEGRATE,CORRECT)
+
+!WFAC1=1.0  !This controls the number of rejected MISFITS in CORRECT;
+	    !a larger value leads to fewer rejections.
+!REJECT_ALIEN=20.0 ! Automatic rejection of very strong reflections
+
+!============== INTEGRATION AND PEAK PROFILE PARAMETERS =====================
+!Specification of the peak profile parameters below overrides the automatic
+!determination from the images
+!Suggested values are listed near the end of INTEGRATE.LP
+!BEAM_DIVERGENCE=   0.80         !arctan(spot diameter/DETECTOR_DISTANCE)
+!BEAM_DIVERGENCE_E.S.D.=   0.080 !half-width (Sigma) of BEAM_DIVERGENCE
+!REFLECTING_RANGE=  0.780 !for crossing the Ewald sphere on shortest route
+!REFLECTING_RANGE_E.S.D.=  0.113 !half-width (mosaicity) of REFLECTING_RANGE
+
+!NUMBER_OF_PROFILE_GRID_POINTS_ALONG_ALPHA/BETA=9 !used by: INTEGRATE
+!NUMBER_OF_PROFILE_GRID_POINTS_ALONG_GAMMA= 9     !used by: INTEGRATE
+
+!CUT=2.0    !defines the integration region for profile fitting
+!MINPK=75.0 !minimum required percentage of observed reflection intensity
+!DELPHI= 5.0!controls the number of reference profiles and scaling factors
+
+!======= PARAMETERS CONTROLLING CORRECTION FACTORS (used by: CORRECT) =======
+!MINIMUM_I/SIGMA=3.0 !minimum intensity/sigma required for scaling reflections
+!NBATCH=-1  !controls the number of correction factors along image numbers
+!REFLECTIONS/CORRECTION_FACTOR=50   !minimum #reflections/correction needed
+!PATCH_SHUTTER_PROBLEM=TRUE         !FALSE is default
+!STRICT_ABSORPTION_CORRECTION=TRUE  !FALSE is default
+!CORRECTIONS= DECAY MODULATION ABSORPTION
+
+!=========== PARAMETERS DEFINING BACKGROUND AND PEAK PIXELS =================
+!STRONG_PIXEL=3.0                              !used by: COLSPOT
+!A 'strong' pixel to be included in a spot must exceed the background
+!by more than the given multiple of standard deviations.
+
+!MAXIMUM_NUMBER_OF_STRONG_PIXELS=1500000       !used by: COLSPOT
+
+!SPOT_MAXIMUM-CENTROID=3.0                     !used by: COLSPOT
+
+!MINIMUM_NUMBER_OF_PIXELS_IN_A_SPOT=6          !used by: COLSPOT
+!This allows to suppress spurious isolated pixels from entering the
+!spot list generated by "COLSPOT".
+
+!NBX=3  NBY=3  !Define a rectangle of size (2*NBX+1)*(2*NBY+1)
+!The variation of counts within the rectangle centered at each image pixel
+!is used for distinguishing between background and spot pixels.
+
+!BACKGROUND_PIXEL=6.0                          !used by: COLSPOT,INTEGRATE
+!An image pixel does not belong to the background region if the local
+!pixel variation exceeds the expected variation by the given number of
+!standard deviations.
+
+!SIGNAL_PIXEL=3.0                              !used by: INTEGRATE
+!A pixel above the threshold contributes to the spot centroid
