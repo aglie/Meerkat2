@@ -7,7 +7,6 @@
 
 #include "misc.h"
 
-
 ///Convert rotation from axis and angle to matrix representation. Assumes u is normalized.
 inline void rotvec2mat(vec3& u, float phi, matrix_3x3& res) {
     // http://en.wikipedia.org/wiki/Rotation_matrix
@@ -30,11 +29,10 @@ inline void rotvec2mat(vec3& u, float phi, matrix_3x3& res) {
     res[2][2] = t * uz * uz + c;
 }
 
-template<typename T1, typename T2>
+template<typename T>
 inline vec3 project_to_evald_sphere(ExperimentalParameters& p,
-                    const T1& x,
-                    const T1& y,
-                    const T2& frame_no)
+                    const T& x,
+                    const T& y)
 {
     auto xmm = (x - p.x_center) * p.pixel_size_x;
     auto ymm = (y - p.y_center) * p.pixel_size_y;
@@ -49,17 +47,25 @@ inline vec3 project_to_evald_sphere(ExperimentalParameters& p,
     return s;
 }
 
+template<typename T>
+inline vec3 rotate_to_frame(
+        ExperimentalParameters& p,
+        vec3 s,
+        const T& frame_no) {
+    auto phi = (frame_no - p.starting_frame) * p.oscillation_angle + p.starting_angle;
+    matrix_3x3 rotation_matrix;
+    rotvec2mat(p.oscillation_axis, -2 * PI_F * phi / 360, rotation_matrix);
+    auto hkl = rotation_matrix * s;
+    return hkl;
+}
+
 template<typename T1, typename T2>
 inline vec3 det2lab(ExperimentalParameters& p,
                     const T1& x,
                     const T1& y,
                     const T2& frame_no)
 {
-    auto phi = (frame_no - p.starting_frame) * p.oscillation_angle + p.starting_angle;
-    matrix_3x3 rotation_matrix;
-    rotvec2mat(p.oscillation_axis, -2 * PI_F * phi / 360, rotation_matrix);
-    auto hkl = rotation_matrix * project_to_evald_sphere(p,x,y,frame_no);
-    return hkl;
+    return rotate_to_frame(p, project_to_evald_sphere(p,x,y), frame_no);
 }
 
 template<typename T1, typename T2>
@@ -71,6 +77,14 @@ inline vec3 det2hkl(ExperimentalParameters& p,
     return p.cell_vectors * det2lab(p,x,y,frame_no);
 }
 
+
+inline void to_index(ReconstructionParameters& par,
+        vec3 hkl, int* indices) {
+    indices[0] = (hkl[0]-par.lower_limits[0])/par.step_sizes[0];
+    indices[1] = (hkl[1]-par.lower_limits[1])/par.step_sizes[1];
+    indices[2] = (hkl[2]-par.lower_limits[2])/par.step_sizes[2];
+}
+
 inline void get_index(
         ExperimentalParameters& exp,
         ReconstructionParameters& par,
@@ -79,9 +93,7 @@ inline void get_index(
 
     auto hkl = det2hkl<int>(exp, x, y, frame_no);
 
-    indices[0] = (hkl[0]-par.lower_limits[0])/par.step_sizes[0];
-    indices[1] = (hkl[1]-par.lower_limits[1])/par.step_sizes[1];
-    indices[2] = (hkl[2]-par.lower_limits[2])/par.step_sizes[2];
+    to_index(par, hkl, indices);
 }
 
 inline bool indices_within_bounds(ReconstructionParameters& p, int* i) {
