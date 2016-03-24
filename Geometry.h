@@ -31,13 +31,11 @@ inline void rotvec2mat(vec3& u, float phi, matrix_3x3& res) {
 }
 
 template<typename T1, typename T2>
-inline void det2lab(ExperimentalParameters& p,
+inline vec3 project_to_evald_sphere(ExperimentalParameters& p,
                     const T1& x,
                     const T1& y,
-                    const T2& frame_no, float& hcalc, float& kcalc, float& lcalc)
+                    const T2& frame_no)
 {
-//    xmm = (pixels_coord[:, [0]] - x_center) * pixelsize_x
-//    ymm = (pixels_coord[:, [1]] - y_center) * pixelsize_y
     auto xmm = (x - p.x_center) * p.pixel_size_x;
     auto ymm = (y - p.y_center) * p.pixel_size_y;
 
@@ -45,18 +43,32 @@ inline void det2lab(ExperimentalParameters& p,
                              ymm * p.detector_y + \
                              p.distance_to_detector * p.detector_normal;
 
-    auto phi = (frame_no - p.starting_frame) * p.oscillation_angle + p.starting_angle;
 
     auto unit_scattering_vector = scattering_vector_mm.normalized();
     auto s = unit_scattering_vector / p.wavelength - p.wavevector;
+    return s;
+}
 
+template<typename T1, typename T2>
+inline vec3 det2lab(ExperimentalParameters& p,
+                    const T1& x,
+                    const T1& y,
+                    const T2& frame_no)
+{
+    auto phi = (frame_no - p.starting_frame) * p.oscillation_angle + p.starting_angle;
     matrix_3x3 rotation_matrix;
     rotvec2mat(p.oscillation_axis, -2 * PI_F * phi / 360, rotation_matrix);
-    auto hkl = p.cell_vectors * (rotation_matrix * s);
+    auto hkl = rotation_matrix * project_to_evald_sphere(p,x,y,frame_no);
+    return hkl;
+}
 
-    hcalc=hkl[0];
-    kcalc=hkl[1];
-    lcalc=hkl[2];
+template<typename T1, typename T2>
+inline vec3 det2hkl(ExperimentalParameters& p,
+                    const T1& x,
+                    const T1& y,
+                    const T2& frame_no)
+{
+    return p.cell_vectors * det2lab(p,x,y,frame_no);
 }
 
 inline void get_index(
@@ -65,12 +77,11 @@ inline void get_index(
         size_t x, size_t y,
         int frame_no, int* indices) {
 
-    float h,k,l;
-    det2lab<int>(exp, x, y, frame_no, h,k,l);
+    auto hkl = det2hkl<int>(exp, x, y, frame_no);
 
-    indices[0] = (h-par.lower_limits[0])/par.step_sizes[0];
-    indices[1] = (k-par.lower_limits[1])/par.step_sizes[1];
-    indices[2] = (l-par.lower_limits[2])/par.step_sizes[2];
+    indices[0] = (hkl[0]-par.lower_limits[0])/par.step_sizes[0];
+    indices[1] = (hkl[1]-par.lower_limits[1])/par.step_sizes[1];
+    indices[2] = (hkl[2]-par.lower_limits[2])/par.step_sizes[2];
 }
 
 inline bool indices_within_bounds(ReconstructionParameters& p, int* i) {

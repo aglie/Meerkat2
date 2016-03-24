@@ -115,10 +115,10 @@ public:
              * Also, are the xyframe positions of Bragg peaks in the final table calculated or determined from say
              * Bragg peak centroids???
              */
-            det2lab(params, x, y, frame_no, hcalс, kcalc, lcalc);
-            TS_ASSERT_DELTA(h,hcalс,0.09);
-            TS_ASSERT_DELTA(k,kcalc,0.09);
-            TS_ASSERT_DELTA(l,lcalc,0.09);
+            auto hkl = det2hkl(params, x, y, frame_no);
+            TS_ASSERT_DELTA(hkl[0],h,0.09);
+            TS_ASSERT_DELTA(hkl[1],k,0.09);
+            TS_ASSERT_DELTA(hkl[2],l,0.09);
         }
 
 //        !ITEM_PSI=12
@@ -133,6 +133,6 @@ public:
         TS_ASSERT_DELTA(2,t[1],0.0000001);
         TS_ASSERT_DELTA(4,t[2],0.0000001);
     }
-    
+
 };
 
