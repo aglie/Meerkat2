@@ -6,6 +6,7 @@
 #define MEERKAT2_IMAGELOADER_H
 
 
+#include <future>
 #include "misc.h"
 #include "cbf.h"
 
@@ -52,18 +53,23 @@ public:
     static string format_template(string, size_t);
     ~ImageLoader() {
         free(data);
+        free(buffer);
     }
     int ny() {return m_dim1;}
     int nx() {return m_dim2;}
     int curernt_frame_no() {return current_frame_number;}
 private:
+    void load_frame_to_buffer();
+    future<void> next_frame_f;
     size_t  m_dim1, m_dim2;
     int current_frame_number, last_frame_number;
     int * data;
+    int * buffer;
     string filename_template;
     string current_frame_filename() {
         return format_template(filename_template, current_frame_number);
     }
+
     // This thing will load data (hopefully asynchronously)
     // and provide an interface to read those files
 

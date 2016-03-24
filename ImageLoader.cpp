@@ -6,6 +6,8 @@
 #include <regex>
 #include <iomanip>
 #include <sstream>
+#include <future>
+#include <iostream>
 #include "ImageLoader.h"
 #include "cbf.h"
 
@@ -91,14 +93,38 @@ ImageLoader::ImageLoader(ExperimentalParameters exp, ReconstructionParameters pa
     m_dim2=first_frame.dim2();
 
     data = (int *)malloc(sizeof(int)*m_dim1*m_dim2);
+    buffer = (int *)malloc(sizeof(int)*m_dim1*m_dim2);
+
+    load_frame_to_buffer();
 }
+
+void ImageLoader::load_frame_to_buffer() {
+    next_frame_f = async(launch::async, //async|deferred
+            [=](int current_frame_number)
+            {
+                CBFFile frame(format_template(filename_template, current_frame_number+1));
+                assert(frame.dim1() == ny() and frame.dim2() == nx());
+                frame.read_data(buffer);
+    }, current_frame_number);
+}
+
+template <typename T>
+void swap_a_for_b(T& a, T& b) {
+    T t=a;
+    a=b;
+    b=t;
+}
+
 bool ImageLoader::load_next_frame() {
     if (++current_frame_number > last_frame_number)
         return false;
 
-    CBFFile frame(current_frame_filename());
-    assert(frame.dim1() == ny() and frame.dim2() == nx());
-    frame.read_data(data);
+    next_frame_f.get();
+    swap_a_for_b(data, buffer);
+
+    if (current_frame_number+1 <= last_frame_number)
+        load_frame_to_buffer();
+
     return true;
 }
 

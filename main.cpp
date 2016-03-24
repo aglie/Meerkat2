@@ -16,7 +16,7 @@ class ImageDataIterator {
 };
 
 
-void reconstruct_data(ExperimentalParameters exp, ReconstructionParameters par) {
+void reconstruct_data(ExperimentalParameters& exp, ReconstructionParameters& par) {
 
     ImageLoader measured_frames(exp, par);
     OutputData out(par);
@@ -50,7 +50,7 @@ void reconstruct_data(ExperimentalParameters exp, ReconstructionParameters par) 
                     int indices[3];
                     //get_index(exp, par, x, y, measured_frames.curernt_frame_no(), indices);
                     to_index(par,
-                             rotate_to_frame(exp, scattering_vectors[x*Ny+y], measured_frames.curernt_frame_no()),
+                             exp.cell_vectors * rotate_to_frame(exp, scattering_vectors[x*Ny+y], measured_frames.curernt_frame_no()),
                              indices);
                     if(indices_within_bounds(par, indices)) {
                         out.rebinned_data_at(indices[0],indices[1],indices[2])+=I;
