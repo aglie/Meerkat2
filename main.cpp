@@ -16,9 +16,52 @@ class ImageDataIterator {
 };
 
 
+void reconstruct_data_baseline(ExperimentalParameters exp, ReconstructionParameters par) {
+
+    ImageLoader measured_frames(exp, par);
+    OutputData out(par);
+    
+    const size_t Nx = measured_frames.nx();
+    const size_t Ny = measured_frames.ny();
+
+//    const microstep_type dNx = par.dNx();
+//    const microstep_type dNy = par.dNy();
+//    const microstep_type dNf = par.dNf();
+
+    // Baseline implementation. Check performance without loop unrolling
+    auto t1 = chrono::system_clock::now();
+
+    while(measured_frames.load_next_frame()) {
+        auto t2 = chrono::system_clock::now();
+        auto dms = chrono::duration_cast<chrono::milliseconds>(t2 - t1);
+
+        cout << "loaded frame " << measured_frames.curernt_frame_no() << " in " << dms.count() << " milliseconds" << endl;
+
+        t1 = chrono::system_clock::now();
+
+        for(size_t x=0; x<Nx; ++x )
+            for(size_t y=0; y<Ny; ++y)
+                if(measured_frames.should_reconstruct(x, y)) {
+                    corrected_frame_dt I = measured_frames.current_frame(x, y);
+                    // No microstepping in the baseline implementation
+                    int indices[3];
+                    get_index(exp, par, x, y, measured_frames.curernt_frame_no(), indices);
+                    if(indices_within_bounds(par, indices)) {
+                        out.rebinned_data_at(indices[0],indices[1],indices[2])+=I;
+                        out.no_pixels_rebinned_at(indices[0],indices[1],indices[2])+=1;
+                    }
+                }
+    }
 
 
-void reconstruct_data(ExperimentalParameters exp, ReconstructionParameters par) {
+    cout << "Writing out " << par.output_filename << endl;
+    out.save_data(par.output_filename, par, exp);
+}
+
+
+
+
+void reconstruct_data_baseline(ExperimentalParameters exp, ReconstructionParameters par) {
 
     ImageLoader measured_frames(exp, par);
     OutputData out(par);
@@ -85,7 +128,7 @@ void reconstruct_data(ExperimentalParameters exp, ReconstructionParameters par) 
         auto t2 = chrono::system_clock::now();
         auto dms = chrono::duration_cast<chrono::milliseconds>(t2 - t1);
 
-        cout << "loaded frame " << measured_frames.curernt_frame_no() << " t=" << dms.count() << " milliseconds" << endl;
+        cout << "loaded frame " << measured_frames.curernt_frame_no() << " in " << dms.count() << " milliseconds" << endl;
 
         t1 = chrono::system_clock::now();
 
@@ -440,7 +483,7 @@ int main(int argc, char* argv[]) {
     ReconstructionParameters par = load_refinement_parameters(argv[1]);
     ExperimentalParameters exp = load_xparm(par.xparm_filename);
 
-    cout << "Loaded experimental parameters from XPARM or GXPARM" << endl;
+    cout << "Loaded experimental parameters" << endl;
     cout << "Starting reconstruction" << endl << endl;
 
     reconstruct_data(exp, par);

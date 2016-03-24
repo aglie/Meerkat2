@@ -66,8 +66,8 @@ public:
         TS_ASSERT_DELTA(0.004726,params.oscillation_axis[2],inp_file_delta);
         TS_ASSERT_DELTA(0.750000,params.wavelength,inp_file_delta);
 
-        TS_ASSERT_DELTA(1005.094666,params.x_center,inp_file_delta);
-        TS_ASSERT_DELTA(1005.766968,params.y_center,inp_file_delta);
+        TS_ASSERT_DELTA(1005.094666,params.y_center,inp_file_delta);
+        TS_ASSERT_DELTA(1005.766968,params.x_center,inp_file_delta);
         TS_ASSERT_DELTA(179.778595,params.distance_to_detector,inp_file_delta);
 
     }
@@ -133,13 +133,6 @@ public:
         TS_ASSERT_DELTA(2,t[1],0.0000001);
         TS_ASSERT_DELTA(4,t[2],0.0000001);
     }
-
-    void test_internal_parser() {
-        string ex("\"hellow there.txt\"");
-        string res;
-        istringstream t(ex);
-        t >> res;
-        TS_ASSERT_EQUALS("abc",res);
-    }
+    
 };
 
