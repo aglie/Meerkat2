@@ -107,7 +107,7 @@ public:
                 continue;
 
             istringstream s(line);
-            s >> h >> k >> l >> I >> sigma >> x >> y >> frame_no;
+            s >> h >> k >> l >> I >> sigma >> y >> x >> frame_no;
             /*
              * Fun observation. The precision here is horrible. I wonder now, is it an error in calculations,
              * or the fact that orientation matrix is rerefined during integration?

@@ -57,8 +57,9 @@ public:
         return {data[0]-other.data[0],data[1]-other.data[1], data[2]-other.data[2]};
     }
 
-private:
     float data[3];
+private:
+
 };
 
 template<typename T>
@@ -143,6 +144,8 @@ struct ExperimentalParameters {
 
     vec3 polarization_plane_normal;
 };
+
+
 
 class FileNotFound : std::exception {
 public:

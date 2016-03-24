@@ -11,6 +11,7 @@ ExperimentalParameters load_experimental_parameters(string filename) {
     //Or maybe figure out the limits from the measured dataset limits??
 }
 
+
 ExperimentalParameters load_xparm(string filename) {
     ifstream in(filename);
 
@@ -23,6 +24,7 @@ ExperimentalParameters load_xparm(string filename) {
     if(r.format!=" XPARM.XDS    VERSION Jun 17, 2015")
         throw UnknownFormat();
 
+
     in >> r.starting_frame >> r.starting_angle >> r.oscillation_angle >>
     r.oscillation_axis[0] >> r.oscillation_axis[1] >> r.oscillation_axis[2] >>
     r.wavelength >> r.wavevector[0] >> r.wavevector[1] >> r.wavevector[2] >>
@@ -30,10 +32,11 @@ ExperimentalParameters load_xparm(string filename) {
     r.cell_vectors[0][0] >> r.cell_vectors[0][1] >> r.cell_vectors[0][2] >>
     r.cell_vectors[1][0] >> r.cell_vectors[1][1] >> r.cell_vectors[1][2] >>
     r.cell_vectors[2][0] >> r.cell_vectors[2][1] >> r.cell_vectors[2][2] >>
-    r.number_of_detector_segments >> r.NX >> r.NY >> r.pixel_size_x >> r.pixel_size_y >>
-    r.x_center >> r.y_center >> r.distance_to_detector >>
-    r.detector_x[0] >> r.detector_x[1] >> r.detector_x[2] >>
+    // We are changing x and y directions because xds uses fortran array notations, while we use C
+    r.number_of_detector_segments >> r.NY >> r.NX  >> r.pixel_size_y >> r.pixel_size_x >>
+    r.y_center >> r.x_center >> r.distance_to_detector >>
     r.detector_y[0] >> r.detector_y[1] >> r.detector_y[2] >>
+    r.detector_x[0] >> r.detector_x[1] >> r.detector_x[2] >>
     r.detector_normal[0] >> r.detector_normal[1] >> r.detector_normal[2];
 
     for (int i=0; i<5; ++i)
