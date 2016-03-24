@@ -79,7 +79,7 @@ public:
     void test_image_loader() {
         ExperimentalParameters exp;
         ReconstructionParameters rec;
-        rec.filename_template="/Users/arkadiy/ag/data/GdFe77Si13/images/gfs1_2_?????.cbf";
+        rec.data_filename_template="/Users/arkadiy/ag/data/GdFe77Si13/images/gfs1_2_?????.cbf";
         rec.first_image=10;
         rec.last_image=10;
         ImageLoader img(exp,rec);
@@ -132,6 +132,14 @@ public:
         TS_ASSERT_DELTA(0,t[0],0.0000001);
         TS_ASSERT_DELTA(2,t[1],0.0000001);
         TS_ASSERT_DELTA(4,t[2],0.0000001);
+    }
+
+    void test_internal_parser() {
+        string ex("\"hellow there.txt\"");
+        string res;
+        istringstream t(ex);
+        t >> res;
+        TS_ASSERT_EQUALS("abc",res);
     }
 };
 

@@ -91,7 +91,8 @@ inline vec3 operator* (matrix_3x3 M, vec3&& v) {
 // Det to lab xds
 // should work in such a way, that zero
 struct ReconstructionParameters {
-    string filename_template;
+    string data_filename_template;
+    string xparm_filename;
     size_t first_image;
     size_t last_image;
     size_t number_of_pixels[3];
@@ -163,6 +164,7 @@ ExperimentalParameters load_experimental_parameters(string filename);
 
 ExperimentalParameters load_xparm(string filename);
 
+ReconstructionParameters load_refinement_parameters(string filename);
 
 
 

@@ -68,7 +68,7 @@ CBFFile::~CBFFile() {
 
 ImageLoader::ImageLoader(ExperimentalParameters exp, ReconstructionParameters par) :
     current_frame_number(par.first_image),
-    filename_template (par.filename_template),
+    filename_template (par.data_filename_template),
     last_frame_number (par.last_image)
 {
     // Get cbflib

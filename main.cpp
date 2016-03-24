@@ -84,10 +84,10 @@ void reconstruct_data(ExperimentalParameters exp, ReconstructionParameters par) 
     while(measured_frames.load_next_frame()) {
         auto t2 = chrono::system_clock::now();
         auto dms = chrono::duration_cast<chrono::milliseconds>(t2 - t1);
-        cout << "it took " << dms.count() << " milliseconds\n";
-        t1 = chrono::system_clock::now();
 
-        cout << "loaded frame " << measured_frames.curernt_frame_no() << endl;
+        cout << "loaded frame " << measured_frames.curernt_frame_no() << " t=" << dms.count() << " milliseconds" << endl;
+
+        t1 = chrono::system_clock::now();
 
         for(size_t x=0; x<Nx; ++x )
             for(size_t y=0; y<Ny; ++y)
@@ -103,9 +103,9 @@ void reconstruct_data(ExperimentalParameters exp, ReconstructionParameters par) 
                 }
     }
 
+
+    cout << "Writing out " << par.output_filename << endl;
     out.save_data(par.output_filename, par, exp);
-
-
 
 
 //
@@ -226,7 +226,7 @@ void reconstruct_data(ExperimentalParameters exp, ReconstructionParameters par) 
 
 
 # function [rebinned_data,number_of_pixels_rebinned,Tp,metric_tensor]=...
-# reconstruct_data(filename_template,...
+# reconstruct_data(data_filename_template,...
 # last_image,...
 # reconstruct_in_orthonormal_basis,...
 # maxind,...
@@ -234,7 +234,7 @@ void reconstruct_data(ExperimentalParameters exp, ReconstructionParameters par) 
 # measured_pixels,...
 # microsteps,...
 #                     unit_cell_transform_matrix)
-def reconstruct_data(filename_template,
+def reconstruct_data(data_filename_template,
                      first_image,
                      last_image,
                      maxind,
@@ -255,7 +255,7 @@ def reconstruct_data(filename_template,
                      scale=None):
 
     def image_name(num):
-        return filename_template % num  #test above
+        return data_filename_template % num  #test above
 
 
     def get_image(fname):
@@ -429,20 +429,21 @@ def reconstruct_data(filename_template,
  */
 
 
-int main() {
-    ExperimentalParameters exp = load_xparm("/Users/arkadiy/ag/data/GdFe77Si13/xds/XPARM.XDS");
-    ReconstructionParameters par {\
-    "/Users/arkadiy/ag/data/GdFe77Si13/images/gfs1_2_?????.cbf",
-    1, 3600,
-    {501,501,501},
-    {-5,-5,-5},
-    {10./500,10./500,10./500},
-    false,
-    "test2.h5",
-    true,
-    100};
+int main(int argc, char* argv[]) {
+    if(argc < 2 or argc > 2) {
+        cout << "usage: meerkat2 parameter_filename";
+        terminate();
+    }
 
-    reconstruct_data(exp,par);
+    cout << "Meerkat2 v. 0.2\n";
+
+    ReconstructionParameters par = load_refinement_parameters(argv[1]);
+    ExperimentalParameters exp = load_xparm(par.xparm_filename);
+
+    cout << "Loaded experimental parameters from XPARM or GXPARM" << endl;
+    cout << "Starting reconstruction" << endl << endl;
+
+    reconstruct_data(exp, par);
 
     return 0;
 }
