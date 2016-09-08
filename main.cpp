@@ -42,6 +42,59 @@ void reconstruct_data(ExperimentalParameters& exp, ReconstructionParameters& par
 
         t1 = chrono::system_clock::now();
 
+        const size_t tile_size=200;
+        for(size_t xt=0; xt<Nx; xt+=tile_size)
+            for(size_t yt=0; yt<Ny; yt+=tile_size)
+                for(size_t x=xt; x<xt+tile_size and x<Nx; ++x )
+                    for(size_t y=yt; y<yt+tile_size and y<Ny; ++y)
+                        if(measured_frames.should_reconstruct(x, y)) {
+                            corrected_frame_dt I = measured_frames.current_frame(x, y);
+                            // No microstepping in the baseline implementation
+                            int indices[3];
+                            //get_index(exp, par, x, y, measured_frames.curernt_frame_no(), indices);
+                            to_index(par,
+                                     exp.cell_vectors * rotate_to_frame(exp, scattering_vectors[x*Ny+y], measured_frames.curernt_frame_no()),
+                                     indices);
+                            if(indices_within_bounds(par, indices)) {
+                                out.rebinned_data_at(indices[0],indices[1],indices[2])+=I;
+                                out.no_pixels_rebinned_at(indices[0],indices[1],indices[2])+=1;
+                            }
+                        }
+    }
+
+
+    free(scattering_vectors);
+
+    cout << "Writing out " << par.output_filename << endl;
+    out.save_data(par.output_filename, par, exp);
+}
+
+void reconstruct_data2(ExperimentalParameters& exp, ReconstructionParameters& par) {
+
+    ImageLoader measured_frames(exp, par);
+    OutputData out(par);
+
+    const size_t Nx = measured_frames.nx();
+    const size_t Ny = measured_frames.ny();
+
+    // Baseline implementation. Check performance without loop unrolling
+    auto t1 = chrono::system_clock::now();
+
+    //cache scattering vectors of each pixel without rotating
+    vec3* scattering_vectors = (vec3*) malloc(sizeof(vec3)*Nx*Ny);
+
+    for(size_t x=0; x<Nx; ++x )
+        for(size_t y=0; y<Ny; ++y)
+            scattering_vectors[x*Ny+y] = project_to_evald_sphere(exp, x, y);
+
+    while(measured_frames.load_next_frame()) {
+        auto t2 = chrono::system_clock::now();
+        auto dms = chrono::duration_cast<chrono::milliseconds>(t2 - t1);
+
+        cout << "loaded frame " << measured_frames.curernt_frame_no() << " in " << dms.count() << " milliseconds" << endl;
+
+        t1 = chrono::system_clock::now();
+
         for(size_t x=0; x<Nx; ++x )
             for(size_t y=0; y<Ny; ++y)
                 if(measured_frames.should_reconstruct(x, y)) {
@@ -488,13 +541,18 @@ int main(int argc, char* argv[]) {
 
     cout << "Meerkat2 v. 0.2\n";
 
-    ReconstructionParameters par = load_refinement_parameters(argv[1]);
-    ExperimentalParameters exp = load_xparm(par.xparm_filename);
+    try {
+        ReconstructionParameters par = load_refinement_parameters(argv[1]);
+        ExperimentalParameters exp = load_xparm(par.xparm_filename);
 
-    cout << "Loaded experimental parameters" << endl;
-    cout << "Starting reconstruction" << endl << endl;
+        cout << "Loaded experimental parameters" << endl;
+        cout << "Starting reconstruction" << endl << endl;
 
-    reconstruct_data(exp, par);
+        reconstruct_data(exp, par);
+    }catch(FileNotFound f_err) {
+        cout << "Error: file " << f_err.filename << " not found\n";
+        return 0;
+    }
 
     return 0;
 }

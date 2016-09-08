@@ -24,7 +24,7 @@ CBFFile::CBFFile(string filename) {
     /* Read the input test file */
 
     if (!(in = fopen(filename.c_str(), "rb")))
-        throw FileDoesNotExist();
+        throw FileNotFound(filename);
 
 
     const char *byteorder;
@@ -65,7 +65,7 @@ void CBFFile::read_data(int* out) {
 
 CBFFile::~CBFFile() {
     throws_cbf_errors (cbf_free_handle (incbf));
-    fclose(in);
+//    fclose(in);
 }
 
 ImageLoader::ImageLoader(ExperimentalParameters exp, ReconstructionParameters par) :
@@ -94,6 +94,8 @@ ImageLoader::ImageLoader(ExperimentalParameters exp, ReconstructionParameters pa
 
     data = (int *)malloc(sizeof(int)*m_dim1*m_dim2);
     buffer = (int *)malloc(sizeof(int)*m_dim1*m_dim2);
+
+
 
     load_frame_to_buffer();
 }

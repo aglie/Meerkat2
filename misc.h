@@ -151,7 +151,9 @@ struct ExperimentalParameters {
 class FileNotFound : std::exception {
 public:
     FileNotFound() {}
+    FileNotFound(string filename): filename(filename) {}
     ~FileNotFound() throw() {}
+    string filename;
 };
 
 class UnknownFormat : std::exception {

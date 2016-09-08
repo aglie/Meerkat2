@@ -17,12 +17,12 @@ ExperimentalParameters load_xparm(string filename) {
     ifstream in(filename);
 
     if(!in)
-        throw FileNotFound();
+        throw FileNotFound(filename);
 
     ExperimentalParameters r;
 
     getline(in, r.format);
-    if(r.format!=" XPARM.XDS    VERSION Jun 17, 2015")
+    if(r.format!=" XPARM.XDS    VERSION Jun 17, 2015" and r.format!=" XPARM.XDS    VERSION Oct 15, 2015")
         throw UnknownFormat();
 
 
@@ -159,7 +159,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
     ifstream in(filename);
 
     if(!in)
-        throw FileNotFound();
+        throw FileNotFound(filename);
 
     ReconstructionParameters par;
     bool symmetric_limits = false;
