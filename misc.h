@@ -86,10 +86,6 @@ inline vec3 operator* (matrix_3x3 M, vec3&& v) {
             M[2][0]*v[0]+M[2][1]*v[1]+M[2][2]*v[2]};
 }
 
-
-
-// Det to lab xds
-// should work in such a way, that zero
 struct ReconstructionParameters {
     string data_filename_template;
     string xparm_filename;
@@ -100,8 +96,8 @@ struct ReconstructionParameters {
     reciprocal_fractional_t step_sizes[3];
     bool reconstruct_in_orthonormal_basis;
     //measured_pixels in some format - missing in the baseline
-    //size_t microsteps[3]; //missing in baseline
-    //size_t skip_frames; //missing in baseline
+    //size_t microsteps[3]; //missing in the baseline
+    //size_t skip_frames; //missing in the baseline
     //unit_cell_transform_matrix=np.eye(3) //missing in baseline
 
     string output_filename;

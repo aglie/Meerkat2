@@ -69,7 +69,6 @@ public:
         TS_ASSERT_DELTA(1005.094666,params.y_center,inp_file_delta);
         TS_ASSERT_DELTA(1005.766968,params.x_center,inp_file_delta);
         TS_ASSERT_DELTA(179.778595,params.distance_to_detector,inp_file_delta);
-
     }
 
     void test_air_absorption_coefficient() {

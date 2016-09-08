@@ -93,9 +93,9 @@ ImageLoader::ImageLoader(ExperimentalParameters exp, ReconstructionParameters pa
     m_dim2=first_frame.dim2();
 
     data = (int *)malloc(sizeof(int)*m_dim1*m_dim2);
-    buffer = (int *)malloc(sizeof(int)*m_dim1*m_dim2);
-
-
+    buffer = (int *)malloc(sizeof(int)*m_dim1*m_dim2); //Tick-tock buffer.
+    // One way to increase speed would be to read and reconstruct several images at a time
+    // possibly it will be cool to shuffle bytes by staggering them together along z??? or actually it should not.
 
     load_frame_to_buffer();
 }
@@ -134,6 +134,7 @@ corrected_frame_dt ImageLoader::current_frame(size_t x, size_t y) {
     return data[x * ny() + y];
 }
 
+/// Replaces ??? in the format file with the image number. Example whatever???.cbf, 2 -> whatever002.cbf
 string ImageLoader::format_template(string format, size_t N) {
     smatch m;
     regex r("\\?+");

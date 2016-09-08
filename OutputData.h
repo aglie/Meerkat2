@@ -42,34 +42,6 @@ private:
     // In a fancier version should dynamically allocate data to save a bit of operating memory
     // on the regions which are not reconstructed
     // (are modulo operations here visibly slow??
-
-
-//    if output_filename is not None:
-//    if os.path.exists(output_filename):
-//    if override:
-//        os.remove(output_filename)
-//    else:
-//    raise Exception('file ' + output_filename + ' already exists')
-//    output_file = create_h5py_with_large_cache(output_filename, size_of_cache)
-//
-
-
-//    if output_filename is None:
-//    raise Exception("output filename shoud be provided")
-//
-//    rebinned_data = output_file.create_dataset('rebinned_data', shape=number_of_pixels, dtype='float64',
-//                                               chunks=True)
-//    number_of_pixels_rebinned = output_file.create_dataset('number_of_pixels_rebinned', shape=number_of_pixels,
-//                                                           dtype='int', chunks=True)
-
-
-//    result['space_group_nr'] = instrument_parameters['space_group_nr']
-//    result['unit_cell'] = instrument_parameters['cell']
-//    result['maxind'] = maxind
-//    result['metric_tensor'] = metric_tensor
-//    result['number_of_pixels'] = number_of_pixels
-//    result['step_size'] = step_size
-//    result['is_direct'] = False
 };
 
 

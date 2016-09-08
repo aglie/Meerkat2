@@ -70,8 +70,6 @@ private:
         return format_template(filename_template, current_frame_number);
     }
 
-    // This thing will load data (hopefully asynchronously)
-    // and provide an interface to read those files
 
     //#TODO: maybe add scale 'median' where scale is defined as a median of a frame divided by a median of a first frame?
 //    if scale is None:

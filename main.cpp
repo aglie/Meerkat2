@@ -24,7 +24,7 @@ void reconstruct_data(ExperimentalParameters& exp, ReconstructionParameters& par
     const size_t Nx = measured_frames.nx();
     const size_t Ny = measured_frames.ny();
 
-    // Baseline implementation. Check performance without loop unrolling
+    //Baseline implementation. Check performance without loop unrolling
     auto t1 = chrono::system_clock::now();
 
     //cache scattering vectors of each pixel without rotating

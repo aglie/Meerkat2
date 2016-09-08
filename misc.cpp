@@ -172,8 +172,6 @@ ReconstructionParameters load_refinement_parameters(string filename) {
             continue;
         }
 
-
-
         if (keyword == "DATA_FILE_TEMPLATE")
             in >> par.data_filename_template;
         else if (keyword == "FIRST_FRAME")
@@ -193,7 +191,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         else if (keyword == "XPARM_FILE")
             in >> par.xparm_filename;
         else {
-            cout << "Unknown keyword " << keyword;
+            cout << "Error: Unknown keyword " << keyword;
             terminate();
         }
     }
