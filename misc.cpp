@@ -13,7 +13,6 @@ ExperimentalParameters load_experimental_parameters(string filename) {
     //Or maybe figure out the limits from the measured dataset limits??
 }
 
-
 ExperimentalParameters load_xparm(string filename) {
     ifstream in(filename);
 
