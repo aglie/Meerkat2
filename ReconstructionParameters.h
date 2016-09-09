@@ -7,41 +7,6 @@
 
 #include "misc.h"
 
-struct ReconstructionParameters {
-    string data_filename_template;
-    string xparm_filename;
-    size_t first_image;
-    size_t last_image;
-    size_t number_of_pixels[3];
-    reciprocal_fractional_t lower_limits[3];
-    reciprocal_fractional_t step_sizes[3];
-    bool reconstruct_in_orthonormal_basis;
-    //measured_pixels in some format - missing in the baseline
-    //size_t microsteps[3]; //missing in the baseline
-    //size_t skip_frames; //missing in the baseline
-    //unit_cell_transform_matrix=np.eye(3) //missing in baseline
-
-    string output_filename;
-    bool override;
-    size_t size_of_cache;
-
-//    microsteps = microsteps[2]
-//    if microsteps < 1:
-//    image_increment = 1 / microsteps
-//    assert (np.mod(image_increment, 1) == 0)
-//    microsteps = 1
-//    else:
-//    image_increment = 1
-
-//    output_filename='reconstruction.h5',
-//    size_of_cache=100,
-//    all_in_memory=False,
-//    override=False,
-//    scale=None):
-
-};
-
-
 struct ExperimentalParameters {
     string format;
     size_t starting_frame;
@@ -64,6 +29,42 @@ struct ExperimentalParameters {
     float polarization_factor;
     string detector;
     float detector_thickness;
+};
+
+struct ReconstructionParameters {
+    string data_filename_template;
+    string xparm_filename;
+    size_t first_image;
+    size_t last_image;
+    size_t number_of_pixels[3];
+    reciprocal_fractional_t lower_limits[3];
+    reciprocal_fractional_t step_sizes[3];
+    bool reconstruct_in_orthonormal_basis;
+    //measured_pixels in some format - missing in the baseline
+    //size_t microsteps[3]; //missing in the baseline
+    //size_t skip_frames; //missing in the baseline
+    //unit_cell_transform_matrix=np.eye(3) //missing in baseline
+
+    string output_filename;
+    bool override;
+    size_t size_of_cache;
+
+    ExperimentalParameters exp;
+
+//    microsteps = microsteps[2]
+//    if microsteps < 1:
+//    image_increment = 1 / microsteps
+//    assert (np.mod(image_increment, 1) == 0)
+//    microsteps = 1
+//    else:
+//    image_increment = 1
+
+//    output_filename='reconstruction.h5',
+//    size_of_cache=100,
+//    all_in_memory=False,
+//    override=False,
+//    scale=None):
+
 };
 
 ReconstructionParameters load_experimental_parameters(string filename);

@@ -30,6 +30,12 @@ inline void rotvec2mat(vec3& u, float phi, matrix_3x3& res) {
     res[2][2] = t * uz * uz + c;
 }
 
+
+//TODO: Hide all this functions in a class ExperimentalGeometry or something like this
+// All this funcitons depend on ExperimentalParameters. It is likely, that they will be implemented the second time
+// if/when I will use the Crysalis orientation matrix definitions. At this moment it would be wise to have two Experimental
+// classes
+// All this functions, though being quite lightweight are outside the main loop so speed is not important here really
 template<typename T>
 inline vec3 real_space_scattering_vector(ExperimentalParameters & p,
                                          const T& x,

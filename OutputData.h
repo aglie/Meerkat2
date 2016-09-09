@@ -20,7 +20,7 @@ public:
     }
     out_float_number& rebinned_data_at(int hi, int ki, int li) {return rebinned_data[hkli2i(hi,ki,li)];}
     size_t& no_pixels_rebinned_at(int hi, int ki, int li) {return no_pixels_rebinned[hkli2i(hi,ki,li)];}
-    void save_data(string filename, ReconstructionParameters par,  ExperimentalParameters exp);
+    void save_data(string filename, ReconstructionParameters par);
     ~OutputData() {
         free(rebinned_data);
         free(no_pixels_rebinned);

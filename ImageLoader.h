@@ -46,7 +46,7 @@ private:
 class ImageLoader {
 
 public:
-    ImageLoader(ExperimentalParameters exp, ReconstructionParameters par);
+    ImageLoader(ReconstructionParameters par);
     bool load_next_frame();
     bool should_reconstruct(size_t x, size_t y) {return current_frame(x,y) >= 0;}
     corrected_frame_dt current_frame(size_t,size_t);

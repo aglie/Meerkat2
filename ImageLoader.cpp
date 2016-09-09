@@ -68,7 +68,7 @@ CBFFile::~CBFFile() {
 //    fclose(in);
 }
 
-ImageLoader::ImageLoader(ExperimentalParameters exp, ReconstructionParameters par) :
+ImageLoader::ImageLoader(ReconstructionParameters par) :
     current_frame_number(par.first_image),
     filename_template (par.data_filename_template),
     last_frame_number (par.last_image)

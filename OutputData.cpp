@@ -62,7 +62,7 @@ void writeFormatString(H5File& file) {
 }
 
 // Ruins the dataset. Should only be used before quitting the program.
-void OutputData::save_data(string filename, ReconstructionParameters par, ExperimentalParameters exp) {
+void OutputData::save_data(string filename, ReconstructionParameters par) {
     for(size_t i=0; i<no_elements(); ++i)
         rebinned_data[i]/=no_pixels_rebinned[i];
 
@@ -76,6 +76,6 @@ void OutputData::save_data(string filename, ReconstructionParameters par, Experi
     writeVector<reciprocal_fractional_t,3> (file, "lower_limits", par.lower_limits);
     writeConstant(file, "is_direct", false);
     writeVector<reciprocal_fractional_t,3>(file, "step_sizes", par.step_sizes);
-    writeVector<float,6> (file, "unit_cell", exp.cell);
+    writeVector<float,6> (file, "unit_cell", par.exp.cell);
     writeFormatString(file);
 }

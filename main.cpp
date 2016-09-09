@@ -17,9 +17,11 @@ class ImageDataIterator {
 };
 
 // For the sake of possibility of future speed optimizations this function is written as close to C as possible
-void reconstruct_data(ExperimentalParameters & exp, ReconstructionParameters& par) {
+void reconstruct_data(ReconstructionParameters& par) {
 
-    ImageLoader measured_frames(exp, par);
+    ExperimentalParameters & exp = par.exp;
+
+    ImageLoader measured_frames(par);
     OutputData out(par);
 
     const size_t Nx = measured_frames.nx();
@@ -37,9 +39,6 @@ void reconstruct_data(ExperimentalParameters & exp, ReconstructionParameters& pa
             scattering_vectors[x*Ny+y] = project_to_evald_sphere(exp, x, y);
             corrections[x*Ny+y] = calculate_correction_coefficient(exp, x, y);
         }
-
-
-
 
     while(measured_frames.load_next_frame()) {
         auto t2 = chrono::system_clock::now();
@@ -73,12 +72,12 @@ void reconstruct_data(ExperimentalParameters & exp, ReconstructionParameters& pa
     free(scattering_vectors);
 
     cout << "Writing out " << par.output_filename << endl;
-    out.save_data(par.output_filename, par, exp);
+    out.save_data(par.output_filename, par);
 }
 
 void reconstruct_data2(ExperimentalParameters & exp, ReconstructionParameters& par) {
 
-    ImageLoader measured_frames(exp, par);
+    ImageLoader measured_frames(par);
     OutputData out(par);
 
     const size_t Nx = measured_frames.nx();
@@ -123,7 +122,7 @@ void reconstruct_data2(ExperimentalParameters & exp, ReconstructionParameters& p
     free(scattering_vectors);
 
     cout << "Writing out " << par.output_filename << endl;
-    out.save_data(par.output_filename, par, exp);
+    out.save_data(par.output_filename, par);
 }
 
 
@@ -131,7 +130,7 @@ void reconstruct_data2(ExperimentalParameters & exp, ReconstructionParameters& p
 
 void reconstruct_data_baseline(ExperimentalParameters exp, ReconstructionParameters par) {
 
-    ImageLoader measured_frames(exp, par);
+    ImageLoader measured_frames(par);
     OutputData out(par);
 
 
@@ -216,7 +215,7 @@ void reconstruct_data_baseline(ExperimentalParameters exp, ReconstructionParamet
 
 
     cout << "Writing out " << par.output_filename << endl;
-    out.save_data(par.output_filename, par, exp);
+    out.save_data(par.output_filename, par);
 
 
 //
@@ -550,12 +549,12 @@ int main(int argc, char* argv[]) {
 
     try {
         ReconstructionParameters par = load_refinement_parameters(argv[1]);
-        ExperimentalParameters exp = load_xparm(par.xparm_filename);
+        par.exp = load_xparm(par.xparm_filename);
 
         cout << "Loaded experimental parameters" << endl;
         cout << "Starting reconstruction" << endl << endl;
 
-        reconstruct_data(exp, par);
+        reconstruct_data(par);
     }catch(FileNotFound f_err) {
         cout << "Error: file " << f_err.filename << " not found\n";
         return 0;

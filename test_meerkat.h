@@ -83,7 +83,7 @@ public:
         rec.data_filename_template="/Users/arkadiy/ag/data/GdFe77Si13/images/gfs1_2_?????.cbf";
         rec.first_image=10;
         rec.last_image=10;
-        ImageLoader img(exp,rec);
+        ImageLoader img(rec);
         TS_ASSERT(img.load_next_frame());
         TS_ASSERT_EQUALS(679, img.current_frame(700,1030));
         TS_ASSERT_EQUALS(774, img.current_frame(701,1030));
