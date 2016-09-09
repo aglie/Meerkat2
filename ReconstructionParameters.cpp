@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <set>
 #include "ReconstructionParameters.h"
 
 ReconstructionParameters load_experimental_parameters(string filename) {
@@ -11,6 +12,15 @@ ReconstructionParameters load_experimental_parameters(string filename) {
     //Also check ascii hkl and load those, figuring out the limits
     //Or maybe figure out the limits from the measured dataset limits??
 }
+
+
+template<class T>
+bool isIn(const T& target, const std::set<T>& the_set)
+{
+    return the_set.find(target) != the_set.end();
+}
+
+const set<string> known_xds_formats = {" XPARM.XDS    VERSION Jun 17, 2015", " XPARM.XDS    VERSION Oct 15, 2015", " XPARM.XDS    VERSION May 1, 2016  BUILT=20160617"};
 
 ExperimentalParameters load_xparm(string filename) {
     ifstream in(filename);
@@ -21,8 +31,8 @@ ExperimentalParameters load_xparm(string filename) {
     ExperimentalParameters r;
 
     getline(in, r.format);
-    if(r.format!=" XPARM.XDS    VERSION Jun 17, 2015" and r.format!=" XPARM.XDS    VERSION Oct 15, 2015")
-        throw UnknownFormat();
+    if(!isIn(r.format,known_xds_formats))
+        cout << "Warning: unknown version of XPARM.XDS file. This version has not been tested yet, use Meerkat at your own risk.\n";
 
 
     in >> r.starting_frame >> r.starting_angle >> r.oscillation_angle >>
