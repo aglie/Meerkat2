@@ -102,7 +102,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
     }
     if (symmetric_limits)
         for (int i = 0; i < 3; ++i)
-            par.step_sizes[i] = -par.lower_limits[i] * 2 / par.number_of_pixels[i];
+            par.step_sizes[i] = -par.lower_limits[i] * 2 / (par.number_of_pixels[i]-1);
 
     par.reconstruct_in_orthonormal_basis = false;
     par.override = true;
@@ -110,12 +110,12 @@ ReconstructionParameters load_refinement_parameters(string filename) {
 
     cout << "Reconstructing frames: " << par.data_filename_template << endl;
     cout << "Using frames from " << par.first_image << " till " << par.last_image << endl;
-    cout << "Output array name: " << par.output_filename;
+    cout << "Output array name: " << par.output_filename << endl;
     cout << "Output array dimensions: " << par.number_of_pixels[0] << " " << par.number_of_pixels[1]
-    << " " << par.number_of_pixels[2] << endl;
+         << " " << par.number_of_pixels[2] << endl;
     cout << "In the limits ";
     for (int i=0; i<3; ++i)
-        cout << par.lower_limits[i] << ' ' << par.lower_limits[i]+(par.step_sizes[i]-1)*par.step_sizes[i] << ' ';
+        cout << par.lower_limits[i] << ' ' << par.lower_limits[i]+(par.number_of_pixels[i]-1)*par.step_sizes[i] << ' ';
     cout << endl << endl;
 
     return par;
