@@ -15,7 +15,7 @@ class ImageDataIterator {
     // SHOULD I APPLY corrections on loading data asynchronously, or on reconstruction???
 };
 
-
+// For the sake of possibility of future speed optimizations this function is written as close to C as possible
 void reconstruct_data(ExperimentalParameters& exp, ReconstructionParameters& par) {
 
     ImageLoader measured_frames(exp, par);
@@ -29,10 +29,16 @@ void reconstruct_data(ExperimentalParameters& exp, ReconstructionParameters& par
 
     //cache scattering vectors of each pixel without rotating
     vec3* scattering_vectors = (vec3*) malloc(sizeof(vec3)*Nx*Ny);
+    float* corrections = (float*) malloc(sizeof(float)*Nx*Ny);
 
     for(size_t x=0; x<Nx; ++x )
-        for(size_t y=0; y<Ny; ++y)
+        for(size_t y=0; y<Ny; ++y) {
             scattering_vectors[x*Ny+y] = project_to_evald_sphere(exp, x, y);
+            corrections[x*Ny+y] = calculate_correction_coefficient(exp, x, y);
+        }
+
+
+
 
     while(measured_frames.load_next_frame()) {
         auto t2 = chrono::system_clock::now();

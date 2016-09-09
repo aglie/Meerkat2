@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "misc.h"
+#include "Geometry.h"
 
 ExperimentalParameters load_experimental_parameters(string filename) {
     //should load the data from XPARM.XDS or GXPARM.XDS
@@ -63,7 +64,7 @@ float air_absorption_coefficient(float wavelength) {
      {2.00000e-03, 5.279e+02},
      {3.00000e-03,1.625e+02},
      {3.20290e-03,1.340e+02},
-     {3.202900000001e-03, 1.485e+02},
+     {3.20290e-03, 1.485e+02},
      {4.00000e-03, 7.788e+01},
      {5.00000e-03, 4.027e+01},
      {6.00000e-03, 2.341e+01},
@@ -120,7 +121,7 @@ float air_absorption_coefficient(float wavelength) {
     return 0.1 * density * interpolated_value;
 }
 
-void calculate_correction_coefficients() {
+float calculate_correction_coefficient(ExperimentalParameters& experiment, int x, int y) {
 /*
  * def correction_coefficients(h, instrument_parameters, medium, polarization_factor, polarization_plane_normal,
                             wavelength, wavevector):
@@ -129,6 +130,9 @@ void calculate_correction_coefficients() {
     mu = air_absorption_coefficient(medium, wavelength)
     air_absorption = np.exp(
         -mu * np.sqrt(np.sum(scattering_vector_mm ** 2, axis=0)))  #check along which dimension. should be of size
+
+
+
 
     polarization_plane_normal = np.array(polarization_plane_normal)
     polarization_plane_normal = polarization_plane_normal / np.linalg.norm(polarization_plane_normal)  # just in case
@@ -150,7 +154,60 @@ void calculate_correction_coefficients() {
 
  */
 
-//TODO: implement detector efficiency for Pilatus
+    auto scattering_vector_mm = real_space_scattering_vector(experiment,x,y);
+    auto unit_scattering_vector = scattering_vector_mm.normalized();
+
+    auto mu = air_absorption_coefficient(experiment.wavelength);
+    auto air_absorption = exp(-mu * scattering_vector_mm.norm());
+    auto polarization_plane_normal=experiment.polarization_plane_normal;
+    // A vector perpendicular to polarization plane and the wavevector
+
+    auto polarization_plane_other_comp = polarization_plane_normal.cross(experiment.wavevector).normalized();
+    auto polarization_correction =
+            (1 - experiment.polarization_factor) * (1 - square(polarization_plane_normal.dot(unit_scattering_vector))) +
+            experiment.polarization_factor * (1 - square(polarization_plane_other_comp.dot(unit_scattering_vector)));
+
+    auto cos_detected_ray_angle = abs(experiment.detector_normal.normalized().dot(unit_scattering_vector));
+    auto solid_angle_correction = pow(cos_detected_ray_angle,3);
+
+    /*
+     *
+     *   /**
+   * Compute the DQE correction for a single reflection
+   * @param mu attenuation coefficient in mm^-1
+   * @param t0 thickness of sensor in mm
+   * @param s1 direction of diffracted ray
+   * @param n detector / panel normal for this reflection
+   * @returns DQE term which needs to be divided by (i.e. is efficiency)
+   *
+
+    double dqe_correction(
+            double mu,
+            double t0,
+            vec3<double> s1,
+            vec3<double> n) {
+        DIALS_ASSERT(mu >= 0);
+        DIALS_ASSERT(t0 >= 0);
+        double cos_angle = cos(n.angle(s1));
+        cos_angle = std::abs(cos_angle);
+        double t = t0 / cos_angle;
+        return 1.0 - exp(-mu * t);
+    }
+     */
+
+    auto res = solid_angle_correction * polarization_correction * air_absorption;
+
+    if (experiment.detector=="Pilatus") {
+        auto ray_len_in_detector = exp.detector_thickness/cos_detected_ray_angle;
+        auto mu_si = silicon_absorption_coefficient(experiment.wavelength);
+        auto pilatus_photon_efficiency = 1-exp(-mu * ray_len_in_detector);
+        res*=pilatus_photon_efficiency;
+    }
+
+    return res;
+
+    //TODO: implement detector efficiency for Pilatus detectors
+    //TODO: Get a Bragg datasets for testing the corrections
 }
 
 

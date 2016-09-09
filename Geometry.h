@@ -30,9 +30,9 @@ inline void rotvec2mat(vec3& u, float phi, matrix_3x3& res) {
 }
 
 template<typename T>
-inline vec3 project_to_evald_sphere(ExperimentalParameters& p,
-                    const T& x,
-                    const T& y)
+inline vec3 real_space_scattering_vector(ExperimentalParameters& p,
+                                    const T& x,
+                                    const T& y)
 {
     auto xmm = (x - p.x_center) * p.pixel_size_x;
     auto ymm = (y - p.y_center) * p.pixel_size_y;
@@ -40,6 +40,16 @@ inline vec3 project_to_evald_sphere(ExperimentalParameters& p,
     vec3 scattering_vector_mm = xmm * p.detector_x + \
                              ymm * p.detector_y + \
                              p.distance_to_detector * p.detector_normal;
+
+    return scattering_vector_mm;
+}
+
+template<typename T>
+inline vec3 project_to_evald_sphere(ExperimentalParameters& p,
+                    const T& x,
+                    const T& y)
+{
+    vec3 scattering_vector_mm = real_space_scattering_vector(p,x,y);
 
 
     auto unit_scattering_vector = scattering_vector_mm.normalized();
