@@ -105,64 +105,6 @@ inline T square(T a){
     return a*a;
 }
 
-struct ReconstructionParameters {
-    string data_filename_template;
-    string xparm_filename;
-    size_t first_image;
-    size_t last_image;
-    size_t number_of_pixels[3];
-    reciprocal_fractional_t lower_limits[3];
-    reciprocal_fractional_t step_sizes[3];
-    bool reconstruct_in_orthonormal_basis;
-    //measured_pixels in some format - missing in the baseline
-    //size_t microsteps[3]; //missing in the baseline
-    //size_t skip_frames; //missing in the baseline
-    //unit_cell_transform_matrix=np.eye(3) //missing in baseline
-
-    string output_filename;
-    bool override;
-    size_t size_of_cache;
-
-//    microsteps = microsteps[2]
-//    if microsteps < 1:
-//    image_increment = 1 / microsteps
-//    assert (np.mod(image_increment, 1) == 0)
-//    microsteps = 1
-//    else:
-//    image_increment = 1
-
-//    output_filename='reconstruction.h5',
-//    size_of_cache=100,
-//    all_in_memory=False,
-//    override=False,
-//    scale=None):
-
-};
-
-
-struct ExperimentalParameters {
-    string format;
-    size_t starting_frame;
-    float starting_angle, oscillation_angle;
-    vec3 oscillation_axis;
-    float wavelength;
-    vec3 wavevector;
-    size_t space_group_nr;
-    vec6 cell;
-    matrix_3x3 cell_vectors;
-    size_t number_of_detector_segments;
-    size_t NX,NY;
-    float pixel_size_x,pixel_size_y,x_center, y_center, distance_to_detector;
-    vec3 detector_x, detector_y, detector_normal;
-
-    float detector_segment_crossection[5];
-    float detector_segment_geometry[9];
-
-    vec3 polarization_plane_normal;
-    float polarization_factor;
-    string detector;
-    float detector_thickness;
-};
 
 
 
@@ -180,24 +122,15 @@ public:
     ~UnknownFormat() throw() {}
 };
 
-
-
-ExperimentalParameters load_experimental_parameters(string filename);
-
-ExperimentalParameters load_xparm(string filename);
-
-ReconstructionParameters load_refinement_parameters(string filename);
-
-
-
 class ValueOutsideRange : std::exception {
 public:
     ValueOutsideRange() {}
     ~ValueOutsideRange() throw() {}
 };
 
-float material_absorption_coefficient(string material, float wavelength);
 
-float calculate_correction_coefficient(ExperimentalParameters& exp, int x, int y);
+
+
+
 
 #endif //MEERKAT2_MISC_H

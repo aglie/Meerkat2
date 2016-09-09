@@ -7,6 +7,7 @@
 
 
 #include "misc.h"
+#include "ReconstructionParameters.h"
 
 class OutputData {
 public:

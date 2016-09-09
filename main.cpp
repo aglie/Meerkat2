@@ -3,6 +3,7 @@
 #include "ImageLoader.h"
 #include "Geometry.h"
 #include "OutputData.h"
+#include "Corrections.h"
 #include <chrono>
 
 using namespace std;
@@ -16,7 +17,7 @@ class ImageDataIterator {
 };
 
 // For the sake of possibility of future speed optimizations this function is written as close to C as possible
-void reconstruct_data(ExperimentalParameters& exp, ReconstructionParameters& par) {
+void reconstruct_data(ExperimentalParameters & exp, ReconstructionParameters& par) {
 
     ImageLoader measured_frames(exp, par);
     OutputData out(par);
@@ -75,7 +76,7 @@ void reconstruct_data(ExperimentalParameters& exp, ReconstructionParameters& par
     out.save_data(par.output_filename, par, exp);
 }
 
-void reconstruct_data2(ExperimentalParameters& exp, ReconstructionParameters& par) {
+void reconstruct_data2(ExperimentalParameters & exp, ReconstructionParameters& par) {
 
     ImageLoader measured_frames(exp, par);
     OutputData out(par);

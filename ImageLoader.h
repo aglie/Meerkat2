@@ -9,6 +9,7 @@
 #include <future>
 #include "misc.h"
 #include "cbf.h"
+#include "ReconstructionParameters.h"
 
 
 class CBFError : std::exception {

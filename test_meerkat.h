@@ -6,6 +6,7 @@
 #include "misc.h"
 #include "ImageLoader.h"
 #include "Geometry.h"
+#include "Corrections.h"
 
 const double inp_file_delta = 0.001;
 
@@ -72,7 +73,7 @@ public:
     }
 
     void test_air_absorption_coefficient() {
-        TS_ASSERT_DELTA(0.00014486405283802817,material_absorption_coefficient("Air", 0.71),0.00000001);
+        TS_ASSERT_DELTA(0.00014486405283802817, material_absorption_coefficient("Air", 0.71),0.00000001);
     }
 
     //TODO: Rewrite this test and point it to a reasonable file

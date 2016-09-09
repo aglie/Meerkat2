@@ -6,6 +6,7 @@
 #define MEERKAT2_GEOMETRY_H
 
 #include "misc.h"
+#include "ReconstructionParameters.h"
 
 ///Convert rotation from axis and angle to matrix representation. Assumes u is normalized.
 inline void rotvec2mat(vec3& u, float phi, matrix_3x3& res) {
@@ -30,9 +31,9 @@ inline void rotvec2mat(vec3& u, float phi, matrix_3x3& res) {
 }
 
 template<typename T>
-inline vec3 real_space_scattering_vector(ExperimentalParameters& p,
-                                    const T& x,
-                                    const T& y)
+inline vec3 real_space_scattering_vector(ExperimentalParameters & p,
+                                         const T& x,
+                                         const T& y)
 {
     auto xmm = (x - p.x_center) * p.pixel_size_x;
     auto ymm = (y - p.y_center) * p.pixel_size_y;
@@ -45,9 +46,9 @@ inline vec3 real_space_scattering_vector(ExperimentalParameters& p,
 }
 
 template<typename T>
-inline vec3 project_to_evald_sphere(ExperimentalParameters& p,
-                    const T& x,
-                    const T& y)
+inline vec3 project_to_evald_sphere(ExperimentalParameters & p,
+                                    const T& x,
+                                    const T& y)
 {
     vec3 scattering_vector_mm = real_space_scattering_vector(p,x,y);
 
@@ -59,7 +60,7 @@ inline vec3 project_to_evald_sphere(ExperimentalParameters& p,
 
 template<typename T>
 inline vec3 rotate_to_frame(
-        ExperimentalParameters& p,
+        ExperimentalParameters & p,
         vec3 s,
         const T& frame_no) {
     auto phi = (frame_no - p.starting_frame) * p.oscillation_angle + p.starting_angle;
@@ -70,7 +71,7 @@ inline vec3 rotate_to_frame(
 }
 
 template<typename T1, typename T2>
-inline vec3 det2lab(ExperimentalParameters& p,
+inline vec3 det2lab(ExperimentalParameters & p,
                     const T1& x,
                     const T1& y,
                     const T2& frame_no)
@@ -79,7 +80,7 @@ inline vec3 det2lab(ExperimentalParameters& p,
 }
 
 template<typename T1, typename T2>
-inline vec3 det2hkl(ExperimentalParameters& p,
+inline vec3 det2hkl(ExperimentalParameters & p,
                     const T1& x,
                     const T1& y,
                     const T2& frame_no)
@@ -96,7 +97,7 @@ inline void to_index(ReconstructionParameters& par,
 }
 
 inline void get_index(
-        ExperimentalParameters& exp,
+        ExperimentalParameters & exp,
         ReconstructionParameters& par,
         size_t x, size_t y,
         int frame_no, int* indices) {
