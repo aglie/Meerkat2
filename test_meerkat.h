@@ -128,6 +128,7 @@ public:
 //        0     0     1 -1.848E+01  4.039E+01  1012.4  1077.5    331.9   0.06083 100 -14  -51.49
     }
 
+
     void test_vector_times_scalar() {
         vec3 t = 2*vec3(0,1,2);
         TS_ASSERT_DELTA(0,t[0],0.0000001);

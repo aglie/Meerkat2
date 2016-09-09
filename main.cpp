@@ -48,13 +48,13 @@ void reconstruct_data(ReconstructionParameters& par) {
 
         t1 = chrono::system_clock::now();
 
-        const size_t tile_size=200;
+        const size_t tile_size=20;
         for(size_t xt=0; xt<Nx; xt+=tile_size)
             for(size_t yt=0; yt<Ny; yt+=tile_size)
                 for(size_t x=xt; x<xt+tile_size and x<Nx; ++x )
                     for(size_t y=yt; y<yt+tile_size and y<Ny; ++y)
                         if(measured_frames.should_reconstruct(x, y)) {
-                            corrected_frame_dt I = measured_frames.current_frame(x, y);
+                            corrected_frame_dt I = measured_frames.current_frame(x, y) / corrections[x*Ny+y];
                             // No microstepping in the baseline implementation
                             int indices[3];
                             //get_index(exp, par, x, y, measured_frames.curernt_frame_no(), indices);
@@ -549,7 +549,7 @@ int main(int argc, char* argv[]) {
 
     try {
         ReconstructionParameters par = load_refinement_parameters(argv[1]);
-        par.exp = load_xparm(par.xparm_filename);
+        load_xparm(par.xparm_filename, par.exp);
 
         cout << "Loaded experimental parameters" << endl;
         cout << "Starting reconstruction" << endl << endl;

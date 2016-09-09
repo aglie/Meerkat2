@@ -69,7 +69,7 @@ struct ReconstructionParameters {
 
 ReconstructionParameters load_experimental_parameters(string filename);
 
-ExperimentalParameters load_xparm(string filename);
+void load_xparm(string filename, ExperimentalParameters & r);
 
 ReconstructionParameters load_refinement_parameters(string filename);
 

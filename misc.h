@@ -14,7 +14,7 @@ using namespace std;
 
 typedef float microstep_type;
 
-typedef int corrected_frame_dt;
+typedef float corrected_frame_dt;
 typedef float out_float_number;
 typedef float reciprocal_fractional_t;
 typedef reciprocal_fractional_t matrix_3x3[3][3];
@@ -104,9 +104,6 @@ template<typename T>
 inline T square(T a){
     return a*a;
 }
-
-
-
 
 class FileNotFound : std::exception {
 public:

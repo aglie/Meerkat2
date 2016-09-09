@@ -139,10 +139,14 @@ string ImageLoader::format_template(string format, size_t N) {
     smatch m;
     regex r("\\?+");
 
-    assert(regex_search (format, m, r));
+    bool found = regex_search(format, m, r);
+    assert(found);
 
     ostringstream formatted_n;
-    formatted_n << setfill('0') << setw(m[0].length()) << N;
+
+    formatted_n << setfill('0') << setw(m.length()) << N;
+
+//    cout << "\n\n\nHERE WE ARE!!!\n\n\n" << "found: " << found << " at " << m.position() << " with len " << m.length() << " " <<formatted_n.str();
 
     return regex_replace(format, r, formatted_n.str());
 }

@@ -22,13 +22,11 @@ bool isIn(const T& target, const std::set<T>& the_set)
 
 const set<string> known_xds_formats = {" XPARM.XDS    VERSION Jun 17, 2015", " XPARM.XDS    VERSION Oct 15, 2015", " XPARM.XDS    VERSION May 1, 2016  BUILT=20160617"};
 
-ExperimentalParameters load_xparm(string filename) {
+void load_xparm(string filename, ExperimentalParameters & r) {
     ifstream in(filename);
 
     if(!in)
         throw FileNotFound(filename);
-
-    ExperimentalParameters r;
 
     getline(in, r.format);
     if(!isIn(r.format,known_xds_formats))
@@ -53,8 +51,6 @@ ExperimentalParameters load_xparm(string filename) {
         in >> r.detector_segment_crossection[i];
     for (int i=0; i<9; ++i)
         in >> r.detector_segment_geometry[i];
-
-    return r;
 }
 
 ReconstructionParameters load_refinement_parameters(string filename) {
@@ -93,6 +89,12 @@ ReconstructionParameters load_refinement_parameters(string filename) {
             in >> par.output_filename;
         else if (keyword == "XPARM_FILE")
             in >> par.xparm_filename;
+        else if (keyword == "POLARIZATION_PLANE_NORMAL")
+            in >> par.exp.polarization_plane_normal[0] >> par.exp.polarization_plane_normal[1] >> par.exp.polarization_plane_normal[2]; //should probably come from xds.inp. Will break encapsulation of exp otherwise
+            //In general, should input file be able to override any of the parameters from XPARM.XDS? Should they be clearly separated?
+            // TODO: decide the above
+        else if (keyword == "POLARIZATION_FACTOR")
+            in >> par.exp.polarization_factor;
         else {
             cout << "Error: Unknown keyword " << keyword;
             terminate();
