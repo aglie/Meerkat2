@@ -72,10 +72,11 @@ public:
     }
 
     void test_air_absorption_coefficient() {
-        TS_ASSERT_DELTA(0.00014486405283802817,air_absorption_coefficient(0.71),0.00000001);
+        TS_ASSERT_DELTA(0.00014486405283802817,material_absorption_coefficient("Air", 0.71),0.00000001);
     }
 
-    void test_image_loader() {
+    //TODO: Rewrite this test and point it to a reasonable file
+    void notest_image_loader() {
         ExperimentalParameters exp;
         ReconstructionParameters rec;
         rec.data_filename_template="/Users/arkadiy/ag/data/GdFe77Si13/images/gfs1_2_?????.cbf";

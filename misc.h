@@ -160,6 +160,8 @@ struct ExperimentalParameters {
 
     vec3 polarization_plane_normal;
     float polarization_factor;
+    string detector;
+    float detector_thickness;
 };
 
 
@@ -178,6 +180,8 @@ public:
     ~UnknownFormat() throw() {}
 };
 
+
+
 ExperimentalParameters load_experimental_parameters(string filename);
 
 ExperimentalParameters load_xparm(string filename);
@@ -192,7 +196,7 @@ public:
     ~ValueOutsideRange() throw() {}
 };
 
-float air_absorption_coefficient(float wavelength);
+float material_absorption_coefficient(string material, float wavelength);
 
 float calculate_correction_coefficient(ExperimentalParameters& exp, int x, int y);
 

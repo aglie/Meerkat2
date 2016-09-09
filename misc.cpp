@@ -50,15 +50,17 @@ ExperimentalParameters load_xparm(string filename) {
 }
 
 
+struct EnergyAttenuationLine {
+    float energy, attenuation;
+};
 
-float air_absorption_coefficient(float wavelength) {
-    //TODO: add new mediums as needed. In the last years we have never measured in helium
+struct MaterialAttenuationParameters {
+    float density;
+    vector<EnergyAttenuationLine> mass_attenuation_coefficients;
+};
 
-    const float density = 1.205e-03;
-    struct EnergyAttenuation {
-        float energy, attenuation;
-    };
-    const EnergyAttenuation mass_attenuation_coefficient[] = \
+const MaterialAttenuationParameters air_attenuation_params = {
+    1.205e-03,
     {{1.00000e-03, 3.606e+03},
      {1.50000e-03, 1.191e+03},
      {2.00000e-03, 5.279e+02},
@@ -96,19 +98,116 @@ float air_absorption_coefficient(float wavelength) {
      {8.00000e+00, 2.225e-02},
      {1.00000e+01, 2.045e-02},
      {1.50000e+01, 1.810e-02},
-     {2.00000e+01, 1.705e-02}};
+     {2.00000e+01, 1.705e-02}}
+};
+const MaterialAttenuationParameters silicon_attenuation_params = {
+    2.33,
+   {{1.00000E-03, 3.606E+03},
+    {1.50000E-03, 1.191E+03},
+    {2.00000E-03, 5.279E+02},
+    {3.00000E-03, 1.625E+02},
+    {3.20290E-03, 1.340E+02},
+    {3.20290E-03, 1.485E+02},
+    {4.00000E-03, 7.788E+01},
+    {5.00000E-03, 4.027E+01},
+    {6.00000E-03, 2.341E+01},
+    {8.00000E-03, 9.921E+00},
+    {1.00000E-02, 5.120E+00},
+    {1.50000E-02, 1.614E+00},
+    {2.00000E-02, 7.779E-01},
+    {3.00000E-02, 3.538E-01},
+    {4.00000E-02, 2.485E-01},
+    {5.00000E-02, 2.080E-01},
+    {6.00000E-02, 1.875E-01},
+    {8.00000E-02, 1.662E-01},
+    {1.00000E-01, 1.541E-01},
+    {1.50000E-01, 1.356E-01},
+    {2.00000E-01, 1.233E-01},
+    {3.00000E-01, 1.067E-01},
+    {4.00000E-01, 9.549E-02},
+    {5.00000E-01, 8.712E-02},
+    {6.00000E-01, 8.055E-02},
+    {8.00000E-01, 7.074E-02},
+    {1.00000E+00, 6.358E-02},
+    {1.25000E+00, 5.687E-02},
+    {1.50000E+00, 5.175E-02},
+    {2.00000E+00, 4.447E-02},
+    {3.00000E+00, 3.581E-02},
+    {4.00000E+00, 3.079E-02},
+    {5.00000E+00, 2.751E-02},
+    {6.00000E+00, 2.522E-02},
+    {8.00000E+00, 2.225E-02},
+    {1.00000E+01, 2.045E-02},
+    {1.50000E+01, 1.810E-02},
+    {2.00000E+01, 1.705E-02}}};
+
+const MaterialAttenuationParameters helium_attenuation_params = {
+    1.785e-04,
+    {{1.00000E-03, 6.084E+01},
+    {1.50000E-03, 1.676E+01},
+    {2.00000E-03, 6.863E+00},
+    {3.00000E-03, 2.007E+00},
+    {4.00000E-03, 9.329E-01},
+    {5.00000E-03, 5.766E-01},
+    {6.00000E-03, 4.195E-01},
+    {8.00000E-03, 2.933E-01},
+    {1.00000E-02, 2.476E-01},
+    {1.50000E-02, 2.092E-01},
+    {2.00000E-02, 1.960E-01},
+    {3.00000E-02, 1.838E-01},
+    {4.00000E-02, 1.763E-01},
+    {5.00000E-02, 1.703E-01},
+    {6.00000E-02, 1.651E-01},
+    {8.00000E-02, 1.562E-01},
+    {1.00000E-01, 1.486E-01},
+    {1.50000E-01, 1.336E-01},
+    {2.00000E-01, 1.224E-01},
+    {3.00000E-01, 1.064E-01},
+    {4.00000E-01, 9.535E-02},
+    {5.00000E-01, 8.707E-02},
+    {6.00000E-01, 8.054E-02},
+    {8.00000E-01, 7.076E-02},
+    {1.00000E+00, 6.362E-02},
+    {1.25000E+00, 5.688E-02},
+    {1.50000E+00, 5.173E-02},
+    {2.00000E+00, 4.422E-02},
+    {3.00000E+00, 3.503E-02},
+    {4.00000E+00, 2.949E-02},
+    {5.00000E+00, 2.577E-02},
+    {6.00000E+00, 2.307E-02},
+    {8.00000E+00, 1.940E-02},
+    {1.00000E+01, 1.703E-02},
+    {1.50000E+01, 1.363E-02},
+    {2.00000E+01, 1.183E-02}}};
+
+float material_absorption_coefficient(string material, float wavelength) {
+    //TODO: add new mediums as needed. In the last years we have never measured in helium
+
+    MaterialAttenuationParameters mat;
+    if(material == "Air") {
+        mat=air_attenuation_params;
+    } else if(material == "Silicon") {
+        mat=silicon_attenuation_params;
+    }else if(material == "Helium") {
+        mat=silicon_attenuation_params;
+    }else {
+        throw runtime_error("Material is unknown: " + material);
+    }
+
+    const float density = mat.density;
+    vector<EnergyAttenuationLine> mass_attenuation_coefficients = mat.mass_attenuation_coefficients;
 
     float etw = 1.23985e-2; //[Mev*Angstroem]
     float photon_energy = etw / wavelength;
 
-    if(photon_energy < begin(mass_attenuation_coefficient)->energy)
+    if(photon_energy < begin(mass_attenuation_coefficients)->energy)
         throw ValueOutsideRange();
-    auto last = end(mass_attenuation_coefficient) - 1;
+    auto last = end(mass_attenuation_coefficients) - 1;
     if(photon_energy > last->energy)
         throw ValueOutsideRange();
 
     //make linear interpolation between nearest points
-    auto right = begin(mass_attenuation_coefficient);
+    auto right = begin(mass_attenuation_coefficients);
     while(right->energy<photon_energy)
         ++right;
 
@@ -157,7 +256,7 @@ float calculate_correction_coefficient(ExperimentalParameters& experiment, int x
     auto scattering_vector_mm = real_space_scattering_vector(experiment,x,y);
     auto unit_scattering_vector = scattering_vector_mm.normalized();
 
-    auto mu = air_absorption_coefficient(experiment.wavelength);
+    auto mu = material_absorption_coefficient("Air", experiment.wavelength);
     auto air_absorption = exp(-mu * scattering_vector_mm.norm());
     auto polarization_plane_normal=experiment.polarization_plane_normal;
     // A vector perpendicular to polarization plane and the wavevector
@@ -170,44 +269,19 @@ float calculate_correction_coefficient(ExperimentalParameters& experiment, int x
     auto cos_detected_ray_angle = abs(experiment.detector_normal.normalized().dot(unit_scattering_vector));
     auto solid_angle_correction = pow(cos_detected_ray_angle,3);
 
-    /*
-     *
-     *   /**
-   * Compute the DQE correction for a single reflection
-   * @param mu attenuation coefficient in mm^-1
-   * @param t0 thickness of sensor in mm
-   * @param s1 direction of diffracted ray
-   * @param n detector / panel normal for this reflection
-   * @returns DQE term which needs to be divided by (i.e. is efficiency)
-   *
-
-    double dqe_correction(
-            double mu,
-            double t0,
-            vec3<double> s1,
-            vec3<double> n) {
-        DIALS_ASSERT(mu >= 0);
-        DIALS_ASSERT(t0 >= 0);
-        double cos_angle = cos(n.angle(s1));
-        cos_angle = std::abs(cos_angle);
-        double t = t0 / cos_angle;
-        return 1.0 - exp(-mu * t);
-    }
-     */
-
     auto res = solid_angle_correction * polarization_correction * air_absorption;
 
     if (experiment.detector=="Pilatus") {
-        auto ray_len_in_detector = exp.detector_thickness/cos_detected_ray_angle;
-        auto mu_si = silicon_absorption_coefficient(experiment.wavelength);
-        auto pilatus_photon_efficiency = 1-exp(-mu * ray_len_in_detector);
+        auto ray_len_in_detector = experiment.detector_thickness/cos_detected_ray_angle;
+        auto mu_si = material_absorption_coefficient("Silicon", experiment.wavelength);
+        auto pilatus_photon_efficiency = 1 - exp(-mu_si * ray_len_in_detector);
         res*=pilatus_photon_efficiency;
     }
 
     return res;
 
-    //TODO: implement detector efficiency for Pilatus detectors
     //TODO: Get a Bragg datasets for testing the corrections
+    //TODO: Get a lot of air scattering from synchrotron to test the corrections
 }
 
 
