@@ -38,6 +38,13 @@ void creadeAndWriteDataset(H5File& file, string datasetName, T* data, hsize_t n,
 }
 
 template <typename T>
+void creadeAndWriteDataset(H5File& file, string datasetName, vector<T> data, hsize_t n, hsize_t* dims) {
+    DataSpace dataspace( n, dims );
+    DataSet dataset = file.createDataSet( datasetName, getH5Type<T>(), dataspace );
+    dataset.write( data.data(), getH5Type<T>() );
+}
+
+template <typename T>
 void writeConstant(H5File& file, string datasetName, T data) {
     H5::DataSet ds = file.createDataSet(datasetName, getH5Type<T>(), H5::DataSpace(H5S_SCALAR));
     ds.write(&data, getH5Type<T>());

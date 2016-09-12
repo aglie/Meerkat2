@@ -6,6 +6,14 @@
 #include "Corrections.h"
 #include <chrono>
 
+//#if (defined(__MACH__) && defined(__APPLE__))
+//#include <malloc/malloc.h>
+//#elif defined(__linux__)
+//#include <malloc.h>
+//#endif
+
+
+
 using namespace std;
 
 class ImageDataIterator {
@@ -31,8 +39,9 @@ void reconstruct_data(ReconstructionParameters& par) {
     auto t1 = chrono::system_clock::now();
 
     //cache scattering vectors of each pixel without rotating
-    vec3* scattering_vectors = (vec3*) malloc(sizeof(vec3)*Nx*Ny);
-    float* corrections = (float*) malloc(sizeof(float)*Nx*Ny);
+    vector<vec3>  scattering_vectors(Nx*Ny);
+    vector<float> corrections(Nx*Ny);
+
 
     for(size_t x=0; x<Nx; ++x )
         for(size_t y=0; y<Ny; ++y) {
@@ -67,9 +76,6 @@ void reconstruct_data(ReconstructionParameters& par) {
                             }
                         }
     }
-
-
-    free(scattering_vectors);
 
     cout << "Writing out " << par.output_filename << endl;
     out.save_data(par.output_filename, par);
@@ -541,12 +547,15 @@ def reconstruct_data(data_filename_template,
 
 int main(int argc, char* argv[]) {
     if(argc < 2 or argc > 2) {
-        cout << "usage: meerkat2 parameter_filename";
-        terminate();
+        cout << "usage: meerkat2 parameter_filename" << endl;
+        return 0;
     }
 
-    cout << "Meerkat2 v. 0.3\n";
+    cout << "Meerkat2 v. 0.3" << endl;
 
+//#if (defined(__MACH__) && defined(__APPLE__))
+//    mallopt(M_CHECK_ACTION, 0);
+//#endif
     try {
         ReconstructionParameters par = load_refinement_parameters(argv[1]);
         load_xparm(par.xparm_filename, par.exp);
@@ -556,7 +565,10 @@ int main(int argc, char* argv[]) {
 
         reconstruct_data(par);
     }catch(FileNotFound f_err) {
-        cout << "Error: file " << f_err.filename << " not found\n";
+        cout << "Error: file \"" << f_err.filename << "\" does not exist." << endl;
+        return 0;
+    } catch (const std::bad_alloc&) {
+        cout  << endl << "Error: not enough operating memory." << endl;
         return 0;
     }
 
