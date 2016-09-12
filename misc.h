@@ -107,10 +107,16 @@ inline T square(T a){
 
 class FileNotFound : std::exception {
 public:
-    FileNotFound() {}
     FileNotFound(string filename): filename(filename) {}
     ~FileNotFound() throw() {}
     string filename;
+};
+
+class ParserError : std::exception {
+public:
+    ParserError(string description): description(description) {}
+    ~ParserError() throw() {}
+    string description;
 };
 
 class UnknownFormat : std::exception {

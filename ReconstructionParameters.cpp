@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <set>
+#include <sstream>
 #include "ReconstructionParameters.h"
 
 ReconstructionParameters load_experimental_parameters(string filename) {
@@ -53,9 +54,97 @@ void load_xparm(string filename, ExperimentalParameters & r) {
         in >> r.detector_segment_geometry[i];
 }
 
+
+bool operator== (const ContextAroundPosition& a, const ContextAroundPosition& b) {
+    return a.lines_after==b.lines_after && a.lines_before==b.lines_before && a.current_line==b.current_line && a.pos_within_current_line==b.pos_within_current_line;
+}
+
+ContextAroundPosition get_context(istream& in) {
+    in.clear();
+    auto exception_mask=in.exceptions();
+    in.exceptions(0);
+
+    if(in.eof())
+    {
+        in.clear();
+        in.seekg(0,ios_base::end);
+    }
+
+    int context_position = in.tellg();
+    vector<string> lines;
+
+    in.seekg(0,ios_base::beg);
+
+    string line;
+    if(context_position==0) { //in case the line is empty
+        getline(in,line);
+        lines.push_back(line);
+    } else
+        while(int(in.tellg()) < context_position and !in.eof()) {
+            getline(in,line);
+            lines.push_back(line);
+        }
+
+    if(in.eof())
+    {
+        in.clear();
+        in.seekg(0,ios_base::end);
+    }
+
+    auto current_line_no=int(lines.size())-1;
+
+    string current_line;
+    if(current_line_no>=0)
+        current_line = lines[current_line_no];
+
+    int position_within_current_line=0;
+    if(in.tellg()>=0)
+        position_within_current_line=current_line.length()-(int(in.tellg())-context_position);
+
+    if (position_within_current_line<0)
+        position_within_current_line=0;
+
+    ostringstream lines_before;
+    if(current_line_no==1) {
+        lines_before << lines[0];
+    } else if(current_line_no>1) {
+        lines_before << lines[current_line_no-2] << endl << lines[current_line_no-1];
+    }
+
+    ostringstream lines_after;
+
+    if(getline(in,line)) {
+        lines_after << line;
+    }
+    if(getline(in,line)) {
+        lines_after << endl << line;
+    }
+
+    in.seekg(context_position, ios_base::beg);
+    string before=lines_before.str();
+    string cur=current_line;
+    string after=lines_after.str();
+
+    in.clear();
+    in.exceptions(exception_mask);
+
+    ostringstream context;
+    context << lines_before.str() << endl << current_line << endl;
+    for(int i=0; i<position_within_current_line; ++i)
+        context << " ";
+    context << "^ - around here" << endl;
+    context << lines_after.str() ;
+
+    return ContextAroundPosition{lines_before.str(), current_line, lines_after.str(), position_within_current_line, current_line_no, context.str()};
+}
+
+
+
 ReconstructionParameters load_refinement_parameters(string filename) {
     //ReconstructionParameters exp = load_xparm("/Users/arkadiy/ag/data/GdFe77Si13/xds/XPARM.XDS");
     ifstream in(filename);
+    in.exceptions(ifstream::failbit | ifstream::badbit); //Also unexpected end of file should be checked
+    // http://www.cplusplus.com/reference/ios/ios/exceptions/
 
     if(!in)
         throw FileNotFound(filename);
@@ -64,41 +153,65 @@ ReconstructionParameters load_refinement_parameters(string filename) {
     bool symmetric_limits = false;
 
     string keyword;
-    while(!in.eof()) {
-        in >> keyword;
-        if (keyword[0] == '!') {
-            getline(in, keyword);
-            continue;
-        }
+    try {
+        while (!in.eof()) {
+            in >> keyword;
+            if (keyword[0] == '!' or keyword[0] == '#') {
+                getline(in, keyword);
+                continue;
+            }
 
-        if (keyword == "DATA_FILE_TEMPLATE")
-            in >> par.data_filename_template;
-        else if (keyword == "FIRST_FRAME")
-            in >> par.first_image;
-        else if (keyword == "LAST_FRAME")
-            in >> par.last_image;
-        else if (keyword == "NUMBER_OF_PIXELS")
-            in >> par.number_of_pixels[0] >> par.number_of_pixels[1] >> par.number_of_pixels[2];
-        else if (keyword == "LOWER_LIMITS")
-            in >> par.lower_limits[0] >> par.lower_limits[1] >> par.lower_limits[2];
-        else if (keyword == "STEP_SIZES")
-            in >> par.step_sizes[0] >> par.step_sizes[1] >> par.step_sizes[2];
-        else if (keyword == "SYMMETRIC_LIMITS")
-            symmetric_limits = true;
-        else if (keyword == "OUTPUT_FILENAME")
-            in >> par.output_filename;
-        else if (keyword == "XPARM_FILE")
-            in >> par.xparm_filename;
-        else if (keyword == "POLARIZATION_PLANE_NORMAL")
-            in >> par.exp.polarization_plane_normal[0] >> par.exp.polarization_plane_normal[1] >> par.exp.polarization_plane_normal[2]; //should probably come from xds.inp. Will break encapsulation of exp otherwise
-            //In general, should input file be able to override any of the parameters from XPARM.XDS? Should they be clearly separated?
-            // TODO: decide the above
-        else if (keyword == "POLARIZATION_FACTOR")
-            in >> par.exp.polarization_factor;
-        else {
-            cout << "Error: Unknown keyword " << keyword;
-            terminate();
+            if (keyword == "DATA_FILE_TEMPLATE")
+                in >> par.data_filename_template;
+            else if (keyword == "FIRST_FRAME")
+                in >> par.first_image;
+            else if (keyword == "LAST_FRAME")
+                in >> par.last_image;
+            else if (keyword == "NUMBER_OF_PIXELS")
+                in >> par.number_of_pixels[0] >> par.number_of_pixels[1] >> par.number_of_pixels[2];
+            else if (keyword == "LOWER_LIMITS")
+                in >> par.lower_limits[0] >> par.lower_limits[1] >> par.lower_limits[2];
+            else if (keyword == "STEP_SIZES")
+                in >> par.step_sizes[0] >> par.step_sizes[1] >> par.step_sizes[2];
+            else if (keyword == "SYMMETRIC_LIMITS")
+                symmetric_limits = true;
+            else if (keyword == "OUTPUT_FILENAME")
+                in >> par.output_filename;
+            else if (keyword == "XPARM_FILE")
+                in >> par.xparm_filename;
+            else if (keyword == "POLARIZATION_PLANE_NORMAL")
+                in >> par.exp.polarization_plane_normal[0] >> par.exp.polarization_plane_normal[1] >>
+                par.exp.polarization_plane_normal[2];
+                //should probably come from xds.inp. Will break encapsulation of exp otherwise
+                //In general, should input file be able to override any of the parameters from XPARM.XDS? Should they be clearly separated?
+                // TODO: decide the above
+            else if (keyword == "POLARIZATION_FACTOR")
+                in >> par.exp.polarization_factor;
+            else {
+                ostringstream err_text;
+
+                auto ctx = get_context(in);
+
+                err_text << endl << "Error parsing \"" << filename << "\" file at line "<< ctx.line_number << endl
+                        << "Unknown keyword \"" << keyword << "\" here:";
+
+                err_text << endl << endl << ctx.context << endl << endl;
+
+                throw ParserError(err_text.str());
+            }
         }
+    } catch (const ios_base::failure& e) {
+        ostringstream err_text;
+
+
+        auto ctx = get_context(in);
+
+        err_text << "Error parsing \"" << filename << "\" file:" <<  "\" at " << ctx.line_number << endl;
+
+        err_text << "Incorrect arguments to keyword \"" << keyword << " here:";
+        err_text << endl << endl << ctx.context << endl << endl;
+
+        throw ParserError(err_text.str());
     }
     //Most of the people will use the lower and upper limits plus the number of steps. Stepsize is something esoteric.
     // TODO: allow to define the range with lower and upper limits and Nsteps
@@ -106,21 +219,11 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         for (int i = 0; i < 3; ++i)
             par.step_sizes[i] = -par.lower_limits[i] * 2 / (par.number_of_pixels[i]-1);
 
-
-
     par.reconstruct_in_orthonormal_basis = false;
     par.override = true;
     par.size_of_cache = 100;
 
-    cout << "Reconstructing frames: " << par.data_filename_template << endl;
-    cout << "Using frames from " << par.first_image << " till " << par.last_image << endl;
-    cout << "Output array name: " << par.output_filename << endl;
-    cout << "Output array dimensions: " << par.number_of_pixels[0] << " " << par.number_of_pixels[1]
-         << " " << par.number_of_pixels[2] << endl;
-    cout << "In the limits ";
-    for (int i=0; i<3; ++i)
-        cout << par.lower_limits[i] << ' ' << par.lower_limits[i]+(par.number_of_pixels[i]-1)*par.step_sizes[i] << ' ';
-    cout << endl << endl;
+
 
     return par;
 }

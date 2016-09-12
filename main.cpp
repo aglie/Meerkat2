@@ -6,6 +6,7 @@
 #include "Corrections.h"
 #include <chrono>
 
+//this might help with error messages when mmap memory allocation fails
 //#if (defined(__MACH__) && defined(__APPLE__))
 //#include <malloc/malloc.h>
 //#elif defined(__linux__)
@@ -553,22 +554,39 @@ int main(int argc, char* argv[]) {
 
     cout << "Meerkat2 v. 0.3" << endl;
 
+//this might help with error messages when mmap memory allocation fails
 //#if (defined(__MACH__) && defined(__APPLE__))
 //    mallopt(M_CHECK_ACTION, 0);
 //#endif
+
     try {
         ReconstructionParameters par = load_refinement_parameters(argv[1]);
+
+        cout << "Reconstructing frames: " << par.data_filename_template << endl;
+        cout << "Using frames from " << par.first_image << " till " << par.last_image << endl;
+        cout << "Output array name: " << par.output_filename << endl;
+        cout << "Output array dimensions: " << par.number_of_pixels[0] << " " << par.number_of_pixels[1]
+        << " " << par.number_of_pixels[2] << endl;
+        cout << "In the limits ";
+        for (int i=0; i<3; ++i)
+            cout << par.lower_limits[i] << ' ' << par.lower_limits[i]+(par.number_of_pixels[i]-1)*par.step_sizes[i] << ' ';
+        cout << endl << endl;
+
         load_xparm(par.xparm_filename, par.exp);
 
         cout << "Loaded experimental parameters" << endl;
         cout << "Starting reconstruction" << endl << endl;
 
         reconstruct_data(par);
-    }catch(FileNotFound f_err) {
+
+    }catch(const FileNotFound& f_err) {
         cout << "Error: file \"" << f_err.filename << "\" does not exist." << endl;
         return 0;
     } catch (const std::bad_alloc&) {
         cout  << endl << "Error: not enough operating memory." << endl;
+        return 0;
+    } catch (const ParserError& err) {
+        cout << err.description << endl;
         return 0;
     }
 

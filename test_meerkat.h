@@ -58,7 +58,8 @@ public:
                       detector_segment_crossection=r_get_numbers(f, 5),
                       detector_segment_geometry=r_get_numbers(f, 9)
          */
-        auto params = load_xparm("tris-amide xds/XPARM.XDS");
+        ExperimentalParameters params;
+        load_xparm("tris-amide xds/XPARM.XDS",params);
         TS_ASSERT_EQUALS(1, params.starting_frame);
         TS_ASSERT_DELTA(0.,params.starting_angle,inp_file_delta);
         TS_ASSERT_DELTA(0.25,params.oscillation_angle,inp_file_delta);
@@ -95,7 +96,8 @@ public:
     }
 
     void test_det2lab() {
-        auto params = load_xparm("tris-amide xds/GXPARM.XDS");
+        ExperimentalParameters params;
+        load_xparm("tris-amide xds/GXPARM.XDS", params);
         ifstream in("tris-amide xds/XDS_ASCII.HKL");
         char first_letter;
         string line;
@@ -128,6 +130,59 @@ public:
 //        0     0     1 -1.848E+01  4.039E+01  1012.4  1077.5    331.9   0.06083 100 -14  -51.49
     }
 
+
+
+    void test_get_context() {
+        istringstream t1("");
+        {
+            ContextAroundPosition ans{"", "", "", 0};
+            TS_ASSERT_EQUALS(ans, get_context(t1));
+        }
+
+        istringstream t2("one two\nthree four\nfive six\nseven eight\nnine ten\neleven twelve");
+        {
+            ContextAroundPosition ans{"", "one two", "three four\nfive six", 0};
+            TS_ASSERT_EQUALS(ans, get_context(t2));
+        }
+
+        t2.seekg(0, ios_base::beg);
+        string rubbish;
+        char newline_holder;
+        getline(t2,rubbish);
+        t2 >> rubbish;
+        TS_ASSERT_EQUALS("three",rubbish);
+        {
+            ContextAroundPosition ans{"one two", "three four", "five six\nseven eight", 4};
+            TS_ASSERT_EQUALS(ans, get_context(t2));
+        }
+        t2.seekg(0, ios_base::beg);
+        getline(t2,rubbish);
+        getline(t2,rubbish);
+        t2>>newline_holder;
+        {
+            ContextAroundPosition ans{"one two\nthree four", "five six", "seven eight\nnine ten", 0};
+            TS_ASSERT_EQUALS(ans, get_context(t2));
+        }
+
+        t2.seekg(0, ios_base::beg);
+        for(int i=0; i<4; ++i)
+            getline(t2,rubbish);
+        t2>>newline_holder;
+        {
+            ContextAroundPosition ans{"five six\nseven eight","nine ten","eleven twelve",0};
+            TS_ASSERT_EQUALS(ans, get_context(t2));
+
+        }
+
+        t2.seekg(0, ios_base::beg);
+        for(int i=0; i<6; ++i)
+            getline(t2,rubbish);
+        {
+            ContextAroundPosition ans{"seven eight\nnine ten","eleven twelve","",13};
+            TS_ASSERT_EQUALS(ans, get_context(t2));
+        }
+
+    }
 
     void test_vector_times_scalar() {
         vec3 t = 2*vec3(0,1,2);

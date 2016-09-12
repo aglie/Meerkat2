@@ -67,6 +67,21 @@ struct ReconstructionParameters {
 
 };
 
+
+
+struct ContextAroundPosition {
+    string lines_before;
+    string current_line;
+    string lines_after;
+    int pos_within_current_line;
+    int line_number;
+    string context;
+};
+
+bool operator== (const ContextAroundPosition& a, const ContextAroundPosition& b);
+
+ContextAroundPosition get_context(istream& in);
+
 ReconstructionParameters load_experimental_parameters(string filename);
 
 void load_xparm(string filename, ExperimentalParameters & r);
