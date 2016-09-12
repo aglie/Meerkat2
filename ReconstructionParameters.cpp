@@ -100,9 +100,13 @@ ReconstructionParameters load_refinement_parameters(string filename) {
             terminate();
         }
     }
+    //Most of the people will use the lower and upper limits plus the number of steps. Stepsize is something esoteric.
+    // TODO: allow to define the range with lower and upper limits and Nsteps
     if (symmetric_limits)
         for (int i = 0; i < 3; ++i)
             par.step_sizes[i] = -par.lower_limits[i] * 2 / (par.number_of_pixels[i]-1);
+
+
 
     par.reconstruct_in_orthonormal_basis = false;
     par.override = true;

@@ -545,7 +545,7 @@ int main(int argc, char* argv[]) {
         terminate();
     }
 
-    cout << "Meerkat2 v. 0.2\n";
+    cout << "Meerkat2 v. 0.3\n";
 
     try {
         ReconstructionParameters par = load_refinement_parameters(argv[1]);
