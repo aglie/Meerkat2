@@ -545,6 +545,16 @@ def reconstruct_data(data_filename_template,
 
  */
 
+///Quickly checks all required frames exist. If one does not thorows FileNotFound exception
+void check_all_frames_exist(ReconstructionParameters par) {
+    for(int i=par.first_image; i<=par.last_image; ++i) {
+        string filename = ImageLoader::format_template(par.data_filename_template,i);
+        ifstream in(filename);
+        if(!in)
+            throw FileNotFound(filename);
+    }
+}
+
 
 int main(int argc, char* argv[]) {
     if(argc < 2 or argc > 2) {
@@ -575,6 +585,9 @@ int main(int argc, char* argv[]) {
         load_xparm(par.xparm_filename, par.exp);
 
         cout << "Loaded experimental parameters" << endl;
+
+        check_all_frames_exist(par);
+
         cout << "Starting reconstruction" << endl << endl;
 
         reconstruct_data(par);
@@ -584,9 +597,6 @@ int main(int argc, char* argv[]) {
         return 0;
     } catch (const std::bad_alloc&) {
         cout  << endl << "Error: not enough operating memory." << endl;
-        return 0;
-    } catch (const ParserError& err) {
-        cout << err.description << endl;
         return 0;
     }
 

@@ -27,8 +27,7 @@ bool operator== (const ContextAroundPosition& a, const ContextAroundPosition& b)
 
 ContextAroundPosition get_context(istream& in) {
     in.clear();
-    auto exception_mask=in.exceptions();
-    in.exceptions(0);
+
 
     if(in.eof())
     {
@@ -91,15 +90,12 @@ ContextAroundPosition get_context(istream& in) {
     string cur=current_line;
     string after=lines_after.str();
 
-    in.clear();
-    in.exceptions(exception_mask);
-
     ostringstream context;
     context << lines_before.str() << endl << current_line << endl;
     for(int i=0; i<position_within_current_line; ++i)
         context << " ";
     context << "^ - around here" << endl;
-    context << lines_after.str() ;
+    context << lines_after.str();
 
     return ContextAroundPosition{lines_before.str(), current_line, lines_after.str(), position_within_current_line, current_line_no, context.str()};
 }

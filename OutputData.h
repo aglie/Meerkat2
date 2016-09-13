@@ -29,7 +29,7 @@ private:
     size_t size[3];
     int hkli2i(int hi, int ki, int li) {return (hi*size[1]+ki)*size[2]+li;}
 
-    // This is in simplest implementation is simply a NxMxL dataset
+    // In the simplest implementation is simply a NxMxL dataset
     // Should allow to hold running sum of rebinned data and the number of pixels rebinned
     // Parameterise over double or float, and different versions of INTS once we willl run in a situation
     // when ints are not enough for reconstruction (possible?)
