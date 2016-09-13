@@ -223,7 +223,5 @@ ReconstructionParameters load_refinement_parameters(string filename) {
     par.override = true;
     par.size_of_cache = 100;
 
-
-
     return par;
 }
