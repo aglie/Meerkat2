@@ -545,12 +545,16 @@ def reconstruct_data(data_filename_template,
 
  */
 
+bool file_exists(const string& filename) {
+    ifstream in(filename);
+    return in.good();
+}
+
 ///Quickly checks all required frames exist. If one does not thorows FileNotFound exception
-void check_all_frames_exist(ReconstructionParameters par) {
+void check_all_frames_exist(const ReconstructionParameters& par) {
     for(int i=par.first_image; i<=par.last_image; ++i) {
         string filename = ImageLoader::format_template(par.data_filename_template,i);
-        ifstream in(filename);
-        if(!in)
+        if(not file_exists(filename))
             throw FileNotFound(filename);
     }
 }
@@ -587,6 +591,10 @@ int main(int argc, char* argv[]) {
         cout << "Loaded experimental parameters" << endl;
 
         check_all_frames_exist(par);
+
+        if(file_exists(par.output_filename)) {
+            cout << "Warning: file \"" << par.output_filename << "\" will be overwritten" << endl;
+        }
 
         cout << "Starting reconstruction" << endl << endl;
 
