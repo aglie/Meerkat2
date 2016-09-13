@@ -11,6 +11,7 @@
 #include "ImageLoader.h"
 #include "cbf.h"
 
+
 CBFFile::CBFFile(string inp_filename) : m_filename(inp_filename) {
 
     size_t numread, nelem, elsize;
@@ -72,12 +73,13 @@ CBFFile::~CBFFile() {
 ImageLoader::ImageLoader(ReconstructionParameters par) :
     current_frame_number(par.first_image),
     filename_template (par.data_filename_template),
-    last_frame_number (par.last_image)
+    last_frame_number (par.last_image),
+    frame_increment(par.frame_increment)
 {
     //get file size
 
     CBFFile first_frame(current_frame_filename());
-    --current_frame_number;
+    current_frame_number-=frame_increment;
 
     //allocate memory
     m_dim1=first_frame.dim1();
@@ -95,7 +97,7 @@ void ImageLoader::load_frame_to_buffer() {
     next_frame_f = async(launch::async, //async|deferred
             [=](int current_frame_number)
             {
-                CBFFile frame(format_template(filename_template, current_frame_number+1));
+                CBFFile frame(format_template(filename_template, current_frame_number+frame_increment));
                 assert(frame.dim1() == ny() and frame.dim2() == nx());
                 frame.read_data(buffer);
     }, current_frame_number);
@@ -109,13 +111,14 @@ void swap_a_for_b(T& a, T& b) {
 }
 
 bool ImageLoader::load_next_frame() {
-    if (++current_frame_number > last_frame_number)
+    current_frame_number+=frame_increment;
+    if (current_frame_number > last_frame_number)
         return false;
 
     next_frame_f.get();
     swap_a_for_b(data, buffer);
 
-    if (current_frame_number+1 <= last_frame_number)
+    if (current_frame_number+frame_increment <= last_frame_number)
         load_frame_to_buffer();
 
     return true;

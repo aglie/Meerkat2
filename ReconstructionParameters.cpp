@@ -242,8 +242,8 @@ ReconstructionParameters load_refinement_parameters(string filename) {
             in >> par.exp.detector;
         else if (keyword == "DETECTOR_THICKNESS")
             in >> par.exp.detector_thickness;
-        else if (keyword == "MICROSTEPS")
-            in >> par.microsteps[0] >> par.microsteps[1] >> par.microsteps[2];
+        else if (keyword == "MICROSTEP_FRAMES")
+            in >> par.microsteps[2];
         else if (keyword == "RECONSTRUCT_EVERY_NTH_FRAME")
             in >> par.frame_increment;
         else {
@@ -283,6 +283,10 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         if(par.microsteps <= 0)
             throw_error(filename, "MICROSTEPS should be positive");
 
+    for(int i=0; i<2; ++i)
+        if(par.microsteps[i] > 1)
+            throw_error(filename, "MICROSTEPS along x and y are currently not supported");
+
     if(par.frame_increment <= 0)
         throw_error(filename, "RECONSTRUCT_EVERY_NTH_FRAME should be positive");
 
@@ -290,7 +294,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         int i;
         for(i=par.first_image; i<10000; i+=par.frame_increment) {
             if(not file_exists(format_template(par.data_filename_template, i))) {
-                --i;
+                i-=par.frame_increment;
                 break;
             }
         }

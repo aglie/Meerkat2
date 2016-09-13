@@ -49,7 +49,6 @@ public:
     bool should_reconstruct(size_t x, size_t y) {return current_frame(x,y) >= 0;}
     corrected_frame_dt current_frame(size_t,size_t);
 
-
     ~ImageLoader() {
         free(data);
         free(buffer);
@@ -59,6 +58,7 @@ public:
     int curernt_frame_no() {return current_frame_number;}
 
 private:
+    size_t frame_increment;
     void load_frame_to_buffer();
     future<void> next_frame_f;
     size_t  m_dim1, m_dim2;

@@ -119,11 +119,11 @@ public:
     string description;
 };
 
-class UnknownFormat : std::exception {
-public:
-    UnknownFormat() {}
-    ~UnknownFormat() throw() {}
-};
+//class UnknownFormat : std::exception {
+//public:
+//    UnknownFormat() {}
+//    ~UnknownFormat() throw() {}
+//};
 
 class ValueOutsideRange : std::exception {
 public:
@@ -133,6 +133,19 @@ public:
 
 bool file_exists(const string& filename);
 string format_template(string, size_t);
+
+class Microstep {
+public:
+    double inc;
+    double start;
+    double end;
+
+    Microstep(size_t no_microsteps, size_t increment_step=1) :
+            inc(1.*increment_step/no_microsteps),
+            start((-double(increment_step)+inc)*0.5),
+            end(0.5*increment_step)
+    {}
+};
 
 
 

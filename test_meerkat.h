@@ -9,6 +9,7 @@
 #include "Corrections.h"
 
 const double inp_file_delta = 0.001;
+const float eps=0.0000001;
 
 class MeerkatTestSuit : public CxxTest::TestSuite
 {
@@ -191,5 +192,32 @@ public:
         TS_ASSERT_DELTA(4,t[2],0.0000001);
     }
 
+    void test_microstep() {
+        Microstep ms1(1,1);
+        TS_ASSERT_DELTA(ms1.start,0,eps);
+        TS_ASSERT_DELTA(ms1.end,0.5,eps);
+        TS_ASSERT_DELTA(ms1.inc,1,eps);
+
+
+        Microstep ms2(1,2);
+        TS_ASSERT_DELTA(ms2.start,0,eps);
+        TS_ASSERT_DELTA(ms2.end,1,eps);
+        TS_ASSERT_DELTA(ms2.inc,2,eps);
+
+        Microstep ms3(2,1);
+        TS_ASSERT_DELTA(ms3.start,-0.25,eps);
+        TS_ASSERT_DELTA(ms3.end,0.5,eps);
+        TS_ASSERT_DELTA(ms3.inc,0.5,eps);
+
+        Microstep ms4(2,2);
+        TS_ASSERT_DELTA(ms4.start,-0.25*2,eps);
+        TS_ASSERT_DELTA(ms4.end,0.5*2,eps);
+        TS_ASSERT_DELTA(ms4.inc,0.5*2,eps);
+
+        Microstep ms5(3,1);
+        TS_ASSERT_DELTA(ms5.start,-1./3,eps);
+        TS_ASSERT_DELTA(ms5.end,0.5,eps);
+        TS_ASSERT_DELTA(ms5.inc,1./3,eps);
+    }
 };
 

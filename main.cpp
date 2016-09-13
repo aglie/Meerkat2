@@ -39,6 +39,8 @@ void reconstruct_data(ReconstructionParameters& par) {
     //Baseline implementation. Check performance without loop unrolling
     auto t1 = chrono::system_clock::now();
 
+    Microstep ms_f(par.microsteps[2],par.frame_increment);
+
     //cache scattering vectors of each pixel without rotating
     vector<vec3>  scattering_vectors(Nx*Ny);
     vector<float> corrections(Nx*Ny);
@@ -65,16 +67,18 @@ void reconstruct_data(ReconstructionParameters& par) {
                     for(size_t y=yt; y<yt+tile_size and y<Ny; ++y)
                         if(measured_frames.should_reconstruct(x, y)) {
                             corrected_frame_dt I = measured_frames.current_frame(x, y) / corrections[x*Ny+y];
-                            // No microstepping in the baseline implementation
-                            int indices[3];
-                            //get_index(exp, par, x, y, measured_frames.curernt_frame_no(), indices);
-                            to_index(par,
-                                     exp.cell_vectors * rotate_to_frame(exp, scattering_vectors[x*Ny+y], measured_frames.curernt_frame_no()),
-                                     indices);
-                            if(indices_within_bounds(par, indices)) {
-                                out.rebinned_data_at(indices[0],indices[1],indices[2])+=I;
-                                out.no_pixels_rebinned_at(indices[0],indices[1],indices[2])+=1;
-                            }
+                                for(auto microstep_df=ms_f.start; microstep_df<ms_f.end; microstep_df+=ms_f.inc) {
+                                    int indices[3];
+                                    //get_index(exp, par, x, y, measured_frames.curernt_frame_no(), indices);
+                                    to_index(par,
+                                             exp.cell_vectors * rotate_to_frame(exp, scattering_vectors[x*Ny+y], measured_frames.curernt_frame_no()+microstep_df),
+                                             indices);
+                                    if(indices_within_bounds(par, indices)) {
+                                        out.rebinned_data_at(indices[0],indices[1],indices[2])+=I;
+                                        out.no_pixels_rebinned_at(indices[0],indices[1],indices[2])+=1;
+                                    }
+                                }
+
                         }
     }
 
