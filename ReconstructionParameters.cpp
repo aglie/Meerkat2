@@ -21,40 +21,6 @@ bool isIn(const T& target, const std::set<T>& the_set)
     return the_set.find(target) != the_set.end();
 }
 
-const set<string> known_xds_formats = {" XPARM.XDS    VERSION Jun 17, 2015", " XPARM.XDS    VERSION Oct 15, 2015", " XPARM.XDS    VERSION May 1, 2016  BUILT=20160617"};
-
-void load_xparm(string filename, ExperimentalParameters & r) {
-    ifstream in(filename);
-
-    if(!in)
-        throw FileNotFound(filename);
-
-    getline(in, r.format);
-    if(!isIn(r.format,known_xds_formats))
-        cout << "Warning: unknown version of XPARM.XDS file. This version has not been tested yet, use Meerkat at your own risk.\n";
-
-
-    in >> r.starting_frame >> r.starting_angle >> r.oscillation_angle >>
-    r.oscillation_axis[0] >> r.oscillation_axis[1] >> r.oscillation_axis[2] >>
-    r.wavelength >> r.wavevector[0] >> r.wavevector[1] >> r.wavevector[2] >>
-    r.space_group_nr >> r.cell[0]>> r.cell[1]>> r.cell[2]>> r.cell[3]>> r.cell[4]>> r.cell[5] >>
-    r.cell_vectors[0][0] >> r.cell_vectors[0][1] >> r.cell_vectors[0][2] >>
-    r.cell_vectors[1][0] >> r.cell_vectors[1][1] >> r.cell_vectors[1][2] >>
-    r.cell_vectors[2][0] >> r.cell_vectors[2][1] >> r.cell_vectors[2][2] >>
-    // We are changing x and y directions because xds uses fortran array notations, while we use C
-    r.number_of_detector_segments >> r.NY >> r.NX  >> r.pixel_size_y >> r.pixel_size_x >>
-    r.y_center >> r.x_center >> r.distance_to_detector >>
-    r.detector_y[0] >> r.detector_y[1] >> r.detector_y[2] >>
-    r.detector_x[0] >> r.detector_x[1] >> r.detector_x[2] >>
-    r.detector_normal[0] >> r.detector_normal[1] >> r.detector_normal[2];
-
-    for (int i=0; i<5; ++i)
-        in >> r.detector_segment_crossection[i];
-    for (int i=0; i<9; ++i)
-        in >> r.detector_segment_geometry[i];
-}
-
-
 bool operator== (const ContextAroundPosition& a, const ContextAroundPosition& b) {
     return a.lines_after==b.lines_after && a.lines_before==b.lines_before && a.current_line==b.current_line && a.pos_within_current_line==b.pos_within_current_line;
 }
@@ -138,12 +104,76 @@ ContextAroundPosition get_context(istream& in) {
     return ContextAroundPosition{lines_before.str(), current_line, lines_after.str(), position_within_current_line, current_line_no, context.str()};
 }
 
+bool reached_eof(const istream& in) {
+    return in.rdstate() & istream::eofbit;
+}
+bool failed(const istream& in) {
+    return in.rdstate() & (istream::badbit | istream::failbit);
+}
+
+string throw_parser_error(const string& filename, istream& in,const string& description) {
+    ostringstream err_text;
+    auto ctx = get_context(in);
+
+    err_text << "Error parsing \"" << filename << "\" file" <<  " at line " << ctx.line_number << endl;
+
+    err_text << description << ":";
+    err_text << endl << endl << ctx.context << endl << endl;
+
+    throw ParserError(err_text.str());
+}
+
+
+const set<string> known_xds_formats = {" XPARM.XDS    VERSION Jun 17, 2015", " XPARM.XDS    VERSION Oct 15, 2015", " XPARM.XDS    VERSION May 1, 2016  BUILT=20160617"};
+
+void load_xparm(string filename, ExperimentalParameters & r) {
+    ifstream in(filename);
+
+    if(!in)
+        throw FileNotFound(filename);
+
+    getline(in, r.format);
+    if (!isIn(r.format, known_xds_formats))
+        cout <<
+        "Warning: unknown version of XPARM.XDS file. This version has not been tested yet, use Meerkat at your own risk.\n";
+
+
+    in >> r.starting_frame >> r.starting_angle >> r.oscillation_angle >>
+    r.oscillation_axis[0] >> r.oscillation_axis[1] >> r.oscillation_axis[2] >>
+    r.wavelength >> r.wavevector[0] >> r.wavevector[1] >> r.wavevector[2] >>
+    r.space_group_nr >> r.cell[0] >> r.cell[1] >> r.cell[2] >> r.cell[3] >> r.cell[4] >> r.cell[5] >>
+    r.cell_vectors[0][0] >> r.cell_vectors[0][1] >> r.cell_vectors[0][2] >>
+    r.cell_vectors[1][0] >> r.cell_vectors[1][1] >> r.cell_vectors[1][2] >>
+    r.cell_vectors[2][0] >> r.cell_vectors[2][1] >> r.cell_vectors[2][2] >>
+    // We are changing x and y directions because xds uses fortran array notations, while we use C
+    r.number_of_detector_segments >> r.NY >> r.NX >> r.pixel_size_y >> r.pixel_size_x >>
+    r.y_center >> r.x_center >> r.distance_to_detector >>
+    r.detector_y[0] >> r.detector_y[1] >> r.detector_y[2] >>
+    r.detector_x[0] >> r.detector_x[1] >> r.detector_x[2] >>
+    r.detector_normal[0] >> r.detector_normal[1] >> r.detector_normal[2];
+
+    if(reached_eof(in)) {
+        throw_parser_error(filename, in, "Unexpected end of file");
+    }
+    else if(failed(in)) {
+        throw_parser_error(filename, in, "Unexpected value");
+    }
+
+
+    for (int i = 0; i < 5; ++i)
+        in >> r.detector_segment_crossection[i];
+    for (int i = 0; i < 9; ++i)
+        in >> r.detector_segment_geometry[i];
+
+}
+
+
 
 
 ReconstructionParameters load_refinement_parameters(string filename) {
     //ReconstructionParameters exp = load_xparm("/Users/arkadiy/ag/data/GdFe77Si13/xds/XPARM.XDS");
     ifstream in(filename);
-    in.exceptions(ifstream::failbit | ifstream::badbit); //Also unexpected end of file should be checked
+    //in.exceptions(ifstream::failbit | ifstream::badbit); //Also unexpected end of file should be checked
     // http://www.cplusplus.com/reference/ios/ios/exceptions/
 
     if(!in)
@@ -153,66 +183,54 @@ ReconstructionParameters load_refinement_parameters(string filename) {
     bool symmetric_limits = false;
 
     string keyword;
-    try {
-        while (!in.eof()) {
-            in >> keyword;
-            if (keyword[0] == '!' or keyword[0] == '#') {
-                getline(in, keyword);
-                continue;
-            }
 
-            if (keyword == "DATA_FILE_TEMPLATE")
-                in >> par.data_filename_template;
-            else if (keyword == "FIRST_FRAME")
-                in >> par.first_image;
-            else if (keyword == "LAST_FRAME")
-                in >> par.last_image;
-            else if (keyword == "NUMBER_OF_PIXELS")
-                in >> par.number_of_pixels[0] >> par.number_of_pixels[1] >> par.number_of_pixels[2];
-            else if (keyword == "LOWER_LIMITS")
-                in >> par.lower_limits[0] >> par.lower_limits[1] >> par.lower_limits[2];
-            else if (keyword == "STEP_SIZES")
-                in >> par.step_sizes[0] >> par.step_sizes[1] >> par.step_sizes[2];
-            else if (keyword == "SYMMETRIC_LIMITS")
-                symmetric_limits = true;
-            else if (keyword == "OUTPUT_FILENAME")
-                in >> par.output_filename;
-            else if (keyword == "XPARM_FILE")
-                in >> par.xparm_filename;
-            else if (keyword == "POLARIZATION_PLANE_NORMAL")
-                in >> par.exp.polarization_plane_normal[0] >> par.exp.polarization_plane_normal[1] >>
-                par.exp.polarization_plane_normal[2];
-                //should probably come from xds.inp. Will break encapsulation of exp otherwise
-                //In general, should input file be able to override any of the parameters from XPARM.XDS? Should they be clearly separated?
-                // TODO: decide the above
-            else if (keyword == "POLARIZATION_FACTOR")
-                in >> par.exp.polarization_factor;
-            else {
-                ostringstream err_text;
+    while (!in.eof()) {
+        in >> keyword;
+        if(reached_eof(in))
+            break;
 
-                auto ctx = get_context(in);
-
-                err_text << endl << "Error parsing \"" << filename << "\" file at line "<< ctx.line_number << endl
-                        << "Unknown keyword \"" << keyword << "\" here:";
-
-                err_text << endl << endl << ctx.context << endl << endl;
-
-                throw ParserError(err_text.str());
-            }
+        if (keyword[0] == '!' or keyword[0] == '#') {
+            getline(in, keyword);
+            continue;
         }
-    } catch (const ios_base::failure& e) {
-        ostringstream err_text;
 
-
-        auto ctx = get_context(in);
-
-        err_text << "Error parsing \"" << filename << "\" file:" <<  "\" at " << ctx.line_number << endl;
-
-        err_text << "Incorrect arguments to keyword \"" << keyword << " here:";
-        err_text << endl << endl << ctx.context << endl << endl;
-
-        throw ParserError(err_text.str());
+        if (keyword == "DATA_FILE_TEMPLATE")
+            in >> par.data_filename_template;
+        else if (keyword == "FIRST_FRAME")
+            in >> par.first_image;
+        else if (keyword == "LAST_FRAME")
+            in >> par.last_image;
+        else if (keyword == "NUMBER_OF_PIXELS")
+            in >> par.number_of_pixels[0] >> par.number_of_pixels[1] >> par.number_of_pixels[2];
+        else if (keyword == "LOWER_LIMITS")
+            in >> par.lower_limits[0] >> par.lower_limits[1] >> par.lower_limits[2];
+        else if (keyword == "STEP_SIZES")
+            in >> par.step_sizes[0] >> par.step_sizes[1] >> par.step_sizes[2];
+        else if (keyword == "SYMMETRIC_LIMITS")
+            symmetric_limits = true;
+        else if (keyword == "OUTPUT_FILENAME")
+            in >> par.output_filename;
+        else if (keyword == "XPARM_FILE")
+            in >> par.xparm_filename;
+        else if (keyword == "POLARIZATION_PLANE_NORMAL")
+            in >> par.exp.polarization_plane_normal[0] >> par.exp.polarization_plane_normal[1] >>
+            par.exp.polarization_plane_normal[2];
+            //should probably come from xds.inp. Will break encapsulation of exp otherwise
+            //In general, should input file be able to override any of the parameters from XPARM.XDS? Should they be clearly separated?
+            // TODO: decide the above
+        else if (keyword == "POLARIZATION_FACTOR")
+            in >> par.exp.polarization_factor;
+        else {
+            throw_parser_error(filename, in, "Unknown keyword \"" + keyword + "\"");
+        }
+        if(reached_eof(in)) {
+            throw_parser_error(filename, in, "Unexpected end of file");
+        }
+        else if(failed(in)) {
+            throw_parser_error(filename, in, "Incorrect arguments to keyword \"" + keyword + "\"");
+        }
     }
+
     //Most of the people will use the lower and upper limits plus the number of steps. Stepsize is something esoteric.
     // TODO: allow to define the range with lower and upper limits and Nsteps
     if (symmetric_limits)
