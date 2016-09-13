@@ -122,7 +122,15 @@ string throw_parser_error(const string& filename, istream& in,const string& desc
 string throw_undefined_keyword(const string& filename, string keyword) {
     ostringstream err_text;
     err_text << "Error parsing \"" << filename << "\" file:" << endl;
-    err_text << "keyword " << keyword << " is not defined." << endl;
+    err_text << "keyword " << keyword << " is missing." << endl;
+
+    throw ParserError(err_text.str());
+}
+
+string throw_error(const string& filename, string error) {
+    ostringstream err_text;
+    err_text << "Error parsing \"" << filename << "\" file:" << endl;
+    err_text << error << endl;
 
     throw ParserError(err_text.str());
 }
@@ -234,6 +242,10 @@ ReconstructionParameters load_refinement_parameters(string filename) {
             in >> par.exp.detector;
         else if (keyword == "DETECTOR_THICKNESS")
             in >> par.exp.detector_thickness;
+        else if (keyword == "MICROSTEPS")
+            in >> par.microsteps[0] >> par.microsteps[1] >> par.microsteps[2];
+        else if (keyword == "RECONSTRUCT_EVERY_NTH_FRAME")
+            in >> par.frame_increment;
         else {
             throw_parser_error(filename, in, "Unknown keyword \"" + keyword + "\"");
         }
@@ -266,6 +278,13 @@ ReconstructionParameters load_refinement_parameters(string filename) {
 
     if(par.xparm_filename=="")
         throw_undefined_keyword(filename, "XPARM_FILE");
+
+    for(int i=0; i<3; ++i)
+        if(par.microsteps <= 0)
+            throw_error(filename, "MICROSTEPS should be positive");
+
+    if(par.frame_increment <= 0)
+        throw_error(filename, "RECONSTRUCT_EVERY_NTH_FRAME should be positive");
 
     if(par.last_image==numeric_limits<size_t>::max()) {
         int i;

@@ -31,8 +31,9 @@ struct ExperimentalParameters {
     float detector_thickness;
 
     ExperimentalParameters() :
-            polarization_plane_normal{0,1,0},
-            polarization_factor(0.5) {}
+            polarization_plane_normal{0, 1, 0},
+            polarization_factor(0.5)
+    {}
 };
 
 struct ReconstructionParameters {
@@ -45,8 +46,8 @@ struct ReconstructionParameters {
     reciprocal_fractional_t step_sizes[3];
     bool reconstruct_in_orthonormal_basis;
     //measured_pixels in some format - missing in the baseline
-    //size_t microsteps[3]; //missing in the baseline
-    //size_t skip_frames; //missing in the baseline
+    size_t microsteps[3];
+    size_t frame_increment;
     //unit_cell_transform_matrix=np.eye(3) //missing in baseline
 
     string output_filename;
@@ -62,7 +63,9 @@ struct ReconstructionParameters {
             lower_limits{NAN,NAN,NAN},
             step_sizes{NAN,NAN,NAN},
             reconstruct_in_orthonormal_basis{false},
-            size_of_cache{100}
+            size_of_cache{100},
+            microsteps{1,1,1},
+            frame_increment{1}
     {}
 
     ExperimentalParameters exp;
@@ -84,7 +87,6 @@ struct ReconstructionParameters {
 };
 
 
-
 struct ContextAroundPosition {
     string lines_before;
     string current_line;
@@ -93,6 +95,7 @@ struct ContextAroundPosition {
     int line_number;
     string context;
 };
+
 
 bool operator== (const ContextAroundPosition& a, const ContextAroundPosition& b);
 

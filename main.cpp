@@ -58,7 +58,7 @@ void reconstruct_data(ReconstructionParameters& par) {
 
         t1 = chrono::system_clock::now();
 
-        const size_t tile_size=20;
+        const size_t tile_size=4;
         for(size_t xt=0; xt<Nx; xt+=tile_size)
             for(size_t yt=0; yt<Ny; yt+=tile_size)
                 for(size_t x=xt; x<xt+tile_size and x<Nx; ++x )
