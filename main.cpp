@@ -282,7 +282,7 @@ void reconstruct_data_baseline(ExperimentalParameters exp, ReconstructionParamet
 
 ///Quickly checks all required frames exist. If one does not thorows FileNotFound exception
 void check_all_frames_exist(const ReconstructionParameters& par) {
-    for(int i=par.first_image; i<=par.last_image; ++i) {
+    for(int i=par.first_image; i<=par.last_image; i+=par.frame_increment) {
         string filename = format_template(par.data_filename_template,i);
         if(not file_exists(filename))
             throw FileNotFound(filename);

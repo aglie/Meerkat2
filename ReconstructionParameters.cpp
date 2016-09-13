@@ -288,7 +288,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
 
     if(par.last_image==numeric_limits<size_t>::max()) {
         int i;
-        for(i=par.first_image; i<10000; ++i) {
+        for(i=par.first_image; i<10000; i+=par.frame_increment) {
             if(not file_exists(format_template(par.data_filename_template, i))) {
                 --i;
                 break;
