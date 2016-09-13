@@ -29,6 +29,10 @@ struct ExperimentalParameters {
     float polarization_factor;
     string detector;
     float detector_thickness;
+
+    ExperimentalParameters() :
+            polarization_plane_normal{0,1,0},
+            polarization_factor(0.5) {}
 };
 
 struct ReconstructionParameters {
@@ -46,8 +50,20 @@ struct ReconstructionParameters {
     //unit_cell_transform_matrix=np.eye(3) //missing in baseline
 
     string output_filename;
-    bool override;
     size_t size_of_cache;
+
+    ReconstructionParameters() :
+            data_filename_template(""),
+            xparm_filename(""),
+            output_filename(""),
+            first_image(1),
+            last_image(numeric_limits<size_t>::max()),
+            number_of_pixels{701,701,701},
+            lower_limits{NAN,NAN,NAN},
+            step_sizes{NAN,NAN,NAN},
+            reconstruct_in_orthonormal_basis{false},
+            size_of_cache{100}
+    {}
 
     ExperimentalParameters exp;
 

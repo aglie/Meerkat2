@@ -131,7 +131,8 @@ public:
     ~ValueOutsideRange() throw() {}
 };
 
-
+bool file_exists(const string& filename);
+string format_template(string, size_t);
 
 
 

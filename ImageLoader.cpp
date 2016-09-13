@@ -11,7 +11,7 @@
 #include "ImageLoader.h"
 #include "cbf.h"
 
-CBFFile::CBFFile(string filename) {
+CBFFile::CBFFile(string inp_filename) : m_filename(inp_filename) {
 
     size_t numread, nelem, elsize;
 
@@ -23,13 +23,14 @@ CBFFile::CBFFile(string filename) {
 
     /* Read the input test file */
 
-    if (!(in = fopen(filename.c_str(), "rb")))
-        throw FileNotFound(filename);
+    if (!(in = fopen(filename().c_str(), "rb")))
+        throw FileNotFound(filename());
 
 
     const char *byteorder;
 
     size_t padding;
+
 
     throws_cbf_errors(cbf_make_handle(&incbf));
     throws_cbf_errors(cbf_read_file(incbf, in, MSG_DIGEST));
@@ -60,7 +61,7 @@ void CBFFile::read_data(int* out) {
                                             out, sizeof(int), 0,
                                             dim1()*dim2(), &numread))
 
-    if (numread != dim1()*dim2()) throw CBFError(10000);
+    if (numread != dim1()*dim2()) throw CBFError(10000, filename());
 }
 
 CBFFile::~CBFFile() {
@@ -73,22 +74,12 @@ ImageLoader::ImageLoader(ReconstructionParameters par) :
     filename_template (par.data_filename_template),
     last_frame_number (par.last_image)
 {
-    // Get cbflib
-    // build it
-    // find example of loading a cbf file data header (I will need data size from it to initialize)
-    // find example of loading cbf data
-    // put it all together
-    // run
-    // pass tests
-    // make function filetemplate -> filename
-    // put it all together
-
-    //check all the needed files exist
     //get file size
-    //allocate memory
+
     CBFFile first_frame(current_frame_filename());
     --current_frame_number;
 
+    //allocate memory
     m_dim1=first_frame.dim1();
     m_dim2=first_frame.dim2();
 
@@ -134,19 +125,4 @@ corrected_frame_dt ImageLoader::current_frame(size_t x, size_t y) {
     return data[x * ny() + y];
 }
 
-/// Replaces ??? in the format file with the image number. Example whatever???.cbf, 2 -> whatever002.cbf
-string ImageLoader::format_template(string format, size_t N) {
-    smatch m;
-    regex r("\\?+");
 
-    bool found = regex_search(format, m, r);
-    assert(found);
-
-    ostringstream formatted_n;
-
-    formatted_n << setfill('0') << setw(m.length()) << N;
-
-//    cout << "\n\n\nHERE WE ARE!!!\n\n\n" << "found: " << found << " at " << m.position() << " with len " << m.length() << " " <<formatted_n.str();
-
-    return regex_replace(format, r, formatted_n.str());
-}

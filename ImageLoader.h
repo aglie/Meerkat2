@@ -14,18 +14,13 @@
 
 class CBFError : std::exception {
 public:
-    CBFError(int code): code(code) {}
+    CBFError(int code, string filename): code(code), filename(filename) {}
     ~CBFError() throw() {}
     int code;
+    string filename;
 };
 
-class FileDoesNotExist : std::exception {
-public:
-    FileDoesNotExist() {}
-    ~FileDoesNotExist() throw() {}
-};
-
-#define throws_cbf_errors(x) {int err; err = (x); if (err) throw CBFError(err);}
+#define throws_cbf_errors(x) {int err; err = (x); if (err) throw CBFError(err,filename());}
 
 class CBFFile {
 public:
@@ -36,7 +31,10 @@ public:
     void read_data(int* out);
     ~CBFFile();
 
+    string filename() {return m_filename;};
+
 private:
+    string m_filename;
     size_t m_dim1, m_dim2, m_dim3;
 
     cbf_handle incbf = NULL;
@@ -51,7 +49,7 @@ public:
     bool should_reconstruct(size_t x, size_t y) {return current_frame(x,y) >= 0;}
     corrected_frame_dt current_frame(size_t,size_t);
 
-    static string format_template(string, size_t);
+
     ~ImageLoader() {
         free(data);
         free(buffer);
@@ -59,6 +57,7 @@ public:
     int ny() {return m_dim1;}
     int nx() {return m_dim2;}
     int curernt_frame_no() {return current_frame_number;}
+
 private:
     void load_frame_to_buffer();
     future<void> next_frame_f;

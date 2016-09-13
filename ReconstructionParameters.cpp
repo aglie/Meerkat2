@@ -119,6 +119,14 @@ string throw_parser_error(const string& filename, istream& in,const string& desc
     throw ParserError(err_text.str());
 }
 
+string throw_undefined_keyword(const string& filename, string keyword) {
+    ostringstream err_text;
+    err_text << "Error parsing \"" << filename << "\" file:" << endl;
+    err_text << "keyword " << keyword << " is not defined." << endl;
+
+    throw ParserError(err_text.str());
+}
+
 
 const set<string> known_xds_formats = {" XPARM.XDS    VERSION Jun 17, 2015", " XPARM.XDS    VERSION Oct 15, 2015", " XPARM.XDS    VERSION May 1, 2016  BUILT=20160617"};
 
@@ -177,6 +185,8 @@ ReconstructionParameters load_refinement_parameters(string filename) {
 
     ReconstructionParameters par;
     bool symmetric_limits = false;
+    reciprocal_fractional_t upper_limits[3];
+    bool upper_limits_defined = false;
 
     string keyword;
 
@@ -200,6 +210,10 @@ ReconstructionParameters load_refinement_parameters(string filename) {
             in >> par.number_of_pixels[0] >> par.number_of_pixels[1] >> par.number_of_pixels[2];
         else if (keyword == "LOWER_LIMITS")
             in >> par.lower_limits[0] >> par.lower_limits[1] >> par.lower_limits[2];
+        else if (keyword == "UPPER_LIMITS") {
+            in >> upper_limits[0] >> upper_limits[1] >> upper_limits[2];
+            upper_limits_defined=true;
+        }
         else if (keyword == "STEP_SIZES")
             in >> par.step_sizes[0] >> par.step_sizes[1] >> par.step_sizes[2];
         else if (keyword == "SYMMETRIC_LIMITS")
@@ -227,15 +241,42 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         }
     }
 
+    if(par.lower_limits[0]==NAN and par.lower_limits[1]==NAN and par.lower_limits[2]==NAN)
+        throw_undefined_keyword(filename,"LOWER_LIMITS");
+
     //Most of the people will use the lower and upper limits plus the number of steps. Stepsize is something esoteric.
     // TODO: allow to define the range with lower and upper limits and Nsteps
     if (symmetric_limits)
         for (int i = 0; i < 3; ++i)
             par.step_sizes[i] = -par.lower_limits[i] * 2 / (par.number_of_pixels[i]-1);
 
-    par.reconstruct_in_orthonormal_basis = false;
-    par.override = true;
-    par.size_of_cache = 100;
+    if(upper_limits_defined)
+        for (int i = 0; i < 3; ++i)
+            par.step_sizes[i] = (upper_limits[i]-par.lower_limits[i]) / (par.number_of_pixels[i]-1);
+
+    if(par.step_sizes[0]==NAN and par.step_sizes[1]==NAN and par.step_sizes[2]==NAN)
+        throw_undefined_keyword(filename,"STEP_SIZES or UPPER_LIMITS or SYMMETRIC_LIMITS");
+
+    if(par.data_filename_template=="")
+        throw_undefined_keyword(filename, "DATA_FILE_TEMPLATE");
+
+    if(par.xparm_filename=="")
+        throw_undefined_keyword(filename, "XPARM_FILE");
+
+    if(par.last_image==numeric_limits<size_t>::max()) {
+        int i;
+        for(i=par.first_image; i<10000; ++i) {
+            if(not file_exists(format_template(par.data_filename_template, i))) {
+                --i;
+                break;
+            }
+        }
+        par.last_image=i;
+    }
+
+
+
+
 
     return par;
 }

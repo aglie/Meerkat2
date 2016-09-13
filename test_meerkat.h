@@ -92,7 +92,7 @@ public:
     }
 
     void test_filename_template() {
-        TS_ASSERT_EQUALS("somewhere/whatever010.cbf",ImageLoader::format_template("somewhere/whatever???.cbf",10));
+        TS_ASSERT_EQUALS("somewhere/whatever010.cbf", format_template("somewhere/whatever???.cbf",10));
     }
 
     void test_det2lab() {
