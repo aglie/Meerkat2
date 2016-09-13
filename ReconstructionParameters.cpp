@@ -230,6 +230,10 @@ ReconstructionParameters load_refinement_parameters(string filename) {
             // TODO: decide the above
         else if (keyword == "POLARIZATION_FACTOR")
             in >> par.exp.polarization_factor;
+        else if (keyword == "DETECTOR")
+            in >> par.exp.detector;
+        else if (keyword == "DETECTOR_THICKNESS")
+            in >> par.exp.detector_thickness;
         else {
             throw_parser_error(filename, in, "Unknown keyword \"" + keyword + "\"");
         }
@@ -274,9 +278,6 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         par.last_image=i;
     }
 
-
-
-
-
     return par;
 }
+// TODO: add a non-trivial check that polarization plane is normal to wavevector otherwise the P correction will fail miserably

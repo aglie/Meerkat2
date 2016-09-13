@@ -214,7 +214,7 @@ float calculate_correction_coefficient(ExperimentalParameters & experiment, int 
 
     auto mu = material_absorption_coefficient("Air", experiment.wavelength);
     auto air_absorption = exp(-mu * scattering_vector_mm.norm());
-    auto polarization_plane_normal=experiment.polarization_plane_normal;
+    auto polarization_plane_normal=experiment.polarization_plane_normal.normalized();
     // A vector perpendicular to polarization plane and the wavevector
 
     auto polarization_plane_other_comp = polarization_plane_normal.cross(experiment.wavevector).normalized();
