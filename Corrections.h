@@ -7,7 +7,7 @@
 
 #include "ReconstructionParameters.h"
 
-float material_absorption_coefficient(string material, float wavelength);
+float transmission(string material, float wavelength, float length);
 float calculate_correction_coefficient(ExperimentalParameters & exp, int x, int y);
 
 #endif //MEERKAT2_CORRECTIONS_H

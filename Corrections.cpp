@@ -58,44 +58,44 @@ const MaterialAttenuationParameters air_attenuation_params = {
 };
 const MaterialAttenuationParameters silicon_attenuation_params = {
         2.33,
-        {{1.00000E-03, 3.606E+03},
-         {1.50000E-03, 1.191E+03},
-         {2.00000E-03, 5.279E+02},
-         {3.00000E-03, 1.625E+02},
-         {3.20290E-03, 1.340E+02},
-         {3.20290E-03, 1.485E+02},
-         {4.00000E-03, 7.788E+01},
-         {5.00000E-03, 4.027E+01},
-         {6.00000E-03, 2.341E+01},
-         {8.00000E-03, 9.921E+00},
-         {1.00000E-02, 5.120E+00},
-         {1.50000E-02, 1.614E+00},
-         {2.00000E-02, 7.779E-01},
-         {3.00000E-02, 3.538E-01},
-         {4.00000E-02, 2.485E-01},
-         {5.00000E-02, 2.080E-01},
-         {6.00000E-02, 1.875E-01},
-         {8.00000E-02, 1.662E-01},
-         {1.00000E-01, 1.541E-01},
-         {1.50000E-01, 1.356E-01},
-         {2.00000E-01, 1.233E-01},
-         {3.00000E-01, 1.067E-01},
-         {4.00000E-01, 9.549E-02},
-         {5.00000E-01, 8.712E-02},
-         {6.00000E-01, 8.055E-02},
-         {8.00000E-01, 7.074E-02},
-         {1.00000E+00, 6.358E-02},
-         {1.25000E+00, 5.687E-02},
-         {1.50000E+00, 5.175E-02},
-         {2.00000E+00, 4.447E-02},
-         {3.00000E+00, 3.581E-02},
-         {4.00000E+00, 3.079E-02},
-         {5.00000E+00, 2.751E-02},
-         {6.00000E+00, 2.522E-02},
-         {8.00000E+00, 2.225E-02},
-         {1.00000E+01, 2.045E-02},
-         {1.50000E+01, 1.810E-02},
-         {2.00000E+01, 1.705E-02}}};
+        {{1.00000E-03, 1.570E+03},
+         {1.50000E-03, 5.355E+02},
+         {1.83890E-03, 3.092E+02},
+         {1.83890E-03, 3.192E+03},
+         {2.00000E-03, 2.777E+03},
+         {3.00000E-03, 9.784E+02},
+         {4.00000E-03, 4.529E+02},
+         {5.00000E-03, 2.450E+02},
+         {6.00000E-03, 1.470E+02},
+         {8.00000E-03, 6.468E+01},
+         {1.00000E-02, 3.389E+01},
+         {1.50000E-02, 1.034E+01},
+         {2.00000E-02, 4.464E+00},
+         {3.00000E-02, 1.436E+00},
+         {4.00000E-02, 7.012E-01},
+         {5.00000E-02, 4.385E-01},
+         {6.00000E-02, 3.207E-01},
+         {8.00000E-02, 2.228E-01},
+         {1.00000E-01, 1.835E-01},
+         {1.50000E-01, 1.448E-01},
+         {2.00000E-01, 1.275E-01},
+         {3.00000E-01, 1.082E-01},
+         {4.00000E-01, 9.614E-02},
+         {5.00000E-01, 8.748E-02},
+         {6.00000E-01, 8.077E-02},
+         {8.00000E-01, 7.082E-02},
+         {1.00000E+00, 6.361E-02},
+         {1.25000E+00, 5.688E-02},
+         {1.50000E+00, 5.183E-02},
+         {2.00000E+00, 4.480E-02},
+         {3.00000E+00, 3.678E-02},
+         {4.00000E+00, 3.240E-02},
+         {5.00000E+00, 2.967E-02},
+         {6.00000E+00, 2.788E-02},
+         {8.00000E+00, 2.574E-02},
+         {1.00000E+01, 2.462E-02},
+         {1.50000E+01, 2.352E-02},
+         {2.00000E+01, 2.338E-02}}};
 
 const MaterialAttenuationParameters helium_attenuation_params = {
         1.785e-04,
@@ -136,7 +136,7 @@ const MaterialAttenuationParameters helium_attenuation_params = {
          {1.50000E+01, 1.363E-02},
          {2.00000E+01, 1.183E-02}}};
 
-float material_absorption_coefficient(string material, float wavelength) {
+float transmission(string material, float wavelength, float path_length) {
     //TODO: add new mediums as needed. In the last years we have never measured in helium
 
     MaterialAttenuationParameters mat;
@@ -145,7 +145,7 @@ float material_absorption_coefficient(string material, float wavelength) {
     } else if(material == "Silicon") {
         mat=silicon_attenuation_params;
     }else if(material == "Helium") {
-        mat=silicon_attenuation_params;
+        mat=helium_attenuation_params;
     }else {
         throw runtime_error("Material is unknown: " + material);
     }
@@ -173,7 +173,9 @@ float material_absorption_coefficient(string material, float wavelength) {
 
     auto interpolated_value = (right->attenuation * dE_val + left->attenuation * (dE_step-dE_val))/dE_step;
 
-    return 0.1 * density * interpolated_value;
+    auto mu = 0.1 * density * interpolated_value;
+
+    return exp(-mu*path_length);
 }
 
 float calculate_correction_coefficient(ExperimentalParameters & experiment, int x, int y) {
@@ -212,8 +214,8 @@ float calculate_correction_coefficient(ExperimentalParameters & experiment, int 
     auto scattering_vector_mm = real_space_scattering_vector(experiment,x,y);
     auto unit_scattering_vector = scattering_vector_mm.normalized();
 
-    auto mu = material_absorption_coefficient("Air", experiment.wavelength);
-    auto air_absorption = exp(-mu * scattering_vector_mm.norm());
+
+    auto air_transmission = transmission("Air", experiment.wavelength, scattering_vector_mm.norm());
     auto polarization_plane_normal=experiment.polarization_plane_normal.normalized();
     // A vector perpendicular to polarization plane and the wavevector
 
@@ -225,12 +227,12 @@ float calculate_correction_coefficient(ExperimentalParameters & experiment, int 
     auto cos_detected_ray_angle = abs(experiment.detector_normal.normalized().dot(unit_scattering_vector));
     auto solid_angle_correction = pow(cos_detected_ray_angle,3);
 
-    auto res = solid_angle_correction * polarization_correction * air_absorption;
+    auto res = solid_angle_correction * polarization_correction * air_transmission;
 
     if (experiment.detector=="Pilatus") {
         auto ray_len_in_detector = experiment.detector_thickness/cos_detected_ray_angle;
-        auto mu_si = material_absorption_coefficient("Silicon", experiment.wavelength);
-        auto pilatus_photon_efficiency = 1 - exp(-mu_si * ray_len_in_detector);
+
+        auto pilatus_photon_efficiency = 1 - transmission("Silicon", experiment.wavelength, ray_len_in_detector);
         res*=pilatus_photon_efficiency;
     }
 

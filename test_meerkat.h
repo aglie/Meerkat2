@@ -74,8 +74,49 @@ public:
         TS_ASSERT_DELTA(179.778595,params.distance_to_detector,inp_file_delta);
     }
 
+    inline float kev_to_angstroems(float kev) {
+        float etw = 1.23985e-2;
+        float angstr = etw / kev;
+        return angstr*1000;
+    }
+
     void test_air_absorption_coefficient() {
-        TS_ASSERT_DELTA(0.00014486405283802817, material_absorption_coefficient("Air", 0.71),0.00000001);
+        //TS_ASSERT_DELTA(0.00014486405283802817, material_absorption_coefficient("Air", 0.71),0.00000001);
+
+        TS_ASSERT_DELTA(0.5474,kev_to_angstroems(22.647),0.0001);
+
+        //values for comparison are taken here: http://web-docs.gsi.de/~stoe_exp/web_programs/x_ray_absorption/index.php
+        TS_ASSERT_DELTA(75.0826/100, transmission("Silicon", kev_to_angstroems(22.647), 0.39),0.04); //probably difference in the interpolation length
+        TS_ASSERT_DELTA(77.3222/100, transmission("Silicon", kev_to_angstroems(22.647), 0.35),0.04);
+        TS_ASSERT_DELTA(97.4609/100, transmission("Silicon", kev_to_angstroems(22.647), 0.035),0.01);
+        TS_ASSERT_DELTA(7.6391/100, transmission("Silicon", kev_to_angstroems(22.647), 3.5),0.04);
+        TS_ASSERT_DELTA(1-0.520410, transmission("Silicon", kev_to_angstroems(22.647), 1),0.06);
+        TS_ASSERT_DELTA(0.0000/100, transmission("Silicon", kev_to_angstroems(10), 10),0.001);
+        TS_ASSERT_DELTA(0.0371/100, transmission("Silicon", kev_to_angstroems(10), 1),0.001);
+        TS_ASSERT_DELTA(45.3904/100, transmission("Silicon", kev_to_angstroems(10), 0.1),0.001);
+        TS_ASSERT_DELTA(92.4052/100, transmission("Silicon", kev_to_angstroems(10), 0.01),0.001);
+        TS_ASSERT_DELTA(99.2132/100, transmission("Silicon", kev_to_angstroems(10), 0.001),0.001);
+
+        TS_ASSERT_DELTA(1-0.000522,  transmission("Helium", kev_to_angstroems(15), 150),0.001);
+        TS_ASSERT_DELTA(99.9997/100, transmission("Helium", kev_to_angstroems(20), 1),0.001);
+        TS_ASSERT_DELTA(99.9967/100, transmission("Helium", kev_to_angstroems(20), 10),0.001);
+        TS_ASSERT_DELTA(99.9674/100, transmission("Helium", kev_to_angstroems(20), 100),0.001);
+        TS_ASSERT_DELTA(99.6746/100, transmission("Helium", kev_to_angstroems(20), 1000),0.001);
+        TS_ASSERT_DELTA(96.7931/100, transmission("Helium", kev_to_angstroems(20), 10000),0.003);
+        TS_ASSERT_DELTA(72.1843/100, transmission("Helium", kev_to_angstroems(20), 100000),0.03);// WHY ON EARTH DOES THIS ONE DIFFER SO MUCH?
+
+        TS_ASSERT_DELTA(1-0.028681,  transmission("Air", kev_to_angstroems(15), 150),0.001);
+        TS_ASSERT_DELTA(99.9806/100, transmission("Air", kev_to_angstroems(15), 1),0.001);
+        TS_ASSERT_DELTA(99.8062/100, transmission("Air", kev_to_angstroems(15), 10),0.001);
+        TS_ASSERT_DELTA(98.0786/100, transmission("Air", kev_to_angstroems(15), 100),0.001);
+        TS_ASSERT_DELTA(82.3654/100, transmission("Air", kev_to_angstroems(15), 1000),0.001);
+        TS_ASSERT_DELTA(14.3697/100, transmission("Air", kev_to_angstroems(15), 10000),0.001);
+
+        TS_ASSERT_DELTA(48.2670/100, transmission("Air", kev_to_angstroems(5), 150),0.001);
+        TS_ASSERT_DELTA(91.1609/100, transmission("Air", kev_to_angstroems(10),150),0.0001);
+        TS_ASSERT_DELTA(97.1319/100, transmission("Air", kev_to_angstroems(15),150),0.001);
+        TS_ASSERT_DELTA(98.6036/100, transmission("Air", kev_to_angstroems(20),150),0.0001);
+        TS_ASSERT_DELTA(99.0924/100, transmission("Air", kev_to_angstroems(25),150),0.0011);
     }
 
     //TODO: Rewrite this test and point it to a reasonable file
@@ -219,5 +260,9 @@ public:
         TS_ASSERT_DELTA(ms5.end,0.5,eps);
         TS_ASSERT_DELTA(ms5.inc,1./3,eps);
     }
+
+
+
+
 };
 
