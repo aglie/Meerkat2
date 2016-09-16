@@ -24,7 +24,9 @@ set(SOURCE_FILES
         ReconstructionParameters.h
         ReconstructionParameters.cpp
         Corrections.cpp
-        Corrections.h)
+        Corrections.h
+        CBFDataReader.h
+        CBFDataReader.cpp)
 add_library(meerkat2-lib ${SOURCE_FILES})
 add_executable(Meerkat2 main.cpp)
 target_link_libraries(Meerkat2 meerkat2-lib libcbf.a ${HDF5_LIBRARIES})

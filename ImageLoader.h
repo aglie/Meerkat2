@@ -8,38 +8,8 @@
 
 #include <future>
 #include "misc.h"
-#include "cbf.h"
 #include "ReconstructionParameters.h"
 
-
-class CBFError : std::exception {
-public:
-    CBFError(int code, string filename): code(code), filename(filename) {}
-    ~CBFError() throw() {}
-    int code;
-    string filename;
-};
-
-#define throws_cbf_errors(x) {int err; err = (x); if (err) throw CBFError(err,filename());}
-
-class CBFFile {
-public:
-    CBFFile(string filename);
-    size_t dim1() {return m_dim1;}
-    size_t dim2() {return m_dim2;}
-    size_t dim3() {return m_dim3;}
-    void read_data(int* out);
-    ~CBFFile();
-
-    string filename() {return m_filename;};
-
-private:
-    string m_filename;
-    size_t m_dim1, m_dim2, m_dim3;
-
-    cbf_handle incbf = NULL;
-    FILE *in;
-};
 
 class ImageLoader {
 

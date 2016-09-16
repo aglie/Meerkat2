@@ -10,65 +10,8 @@
 #include <iostream>
 #include "ImageLoader.h"
 #include "cbf.h"
+#include "CBFDataReader.h"
 
-
-CBFFile::CBFFile(string inp_filename) : m_filename(inp_filename) {
-
-    size_t numread, nelem, elsize;
-
-    unsigned int compression;
-
-    int id, elsigned, elunsigned, maxel, minel;
-
-    int i, j, k;
-
-    /* Read the input test file */
-
-    if (!(in = fopen(filename().c_str(), "rb")))
-        throw FileNotFound(filename());
-
-
-    const char *byteorder;
-
-    size_t padding;
-
-
-    throws_cbf_errors(cbf_make_handle(&incbf));
-    throws_cbf_errors(cbf_read_file(incbf, in, MSG_DIGEST));
-    throws_cbf_errors(cbf_rewind_datablock(incbf));
-    throws_cbf_errors(cbf_rewind_category(incbf));
-    throws_cbf_errors(cbf_find_column(incbf, "data"));
-    throws_cbf_errors(cbf_rewind_row(incbf));
-
-    throws_cbf_errors (cbf_get_integerarrayparameters_wdims(incbf, &compression, &id, &elsize, &elsigned,
-                                                      &elunsigned, &nelem, &maxel, &minel, &byteorder, &m_dim1, &m_dim2,
-                                                      &m_dim3, &padding))
-
-//    fprintf(stderr, "testflat: element size %ld, element signed %d, element unsigned %d\n",
-//            (long) elsize, elsigned, elunsigned);
-//    fprintf(stderr, "testflat: byte order %s, dimensions %ld, %ld, padding %ld\n",
-//            byteorder, (long) dim1, (long) dim2, (long) padding);
-//
-//    if (compression != CBF_BYTE_OFFSET)
-//        fprintf(stderr, "testflat: Compression %x instead of CBF_BYTE_OFFSET\n", compression);
-//
-//    if (elsize != sizeof(int))
-//        fprintf(stderr, "testflat: element size %ld instead of %d\n", (long) elsize, (int) sizeof(int));
-
-}
-void CBFFile::read_data(int* out) {
-    size_t numread;
-    throws_cbf_errors (cbf_get_integerarray(incbf, NULL,
-                                            out, sizeof(int), 0,
-                                            dim1()*dim2(), &numread))
-
-    if (numread != dim1()*dim2()) throw CBFError(10000, filename());
-}
-
-CBFFile::~CBFFile() {
-    throws_cbf_errors (cbf_free_handle (incbf));
-//    fclose(in);
-}
 
 ImageLoader::ImageLoader(ReconstructionParameters par) :
     current_frame_number(par.first_image),
@@ -78,7 +21,7 @@ ImageLoader::ImageLoader(ReconstructionParameters par) :
 {
     //get file size
 
-    CBFFile first_frame(current_frame_filename());
+    CBFDataReader first_frame(current_frame_filename());
     current_frame_number-=frame_increment;
 
     //allocate memory
@@ -97,7 +40,7 @@ void ImageLoader::load_frame_to_buffer() {
     next_frame_f = async(launch::async, //async|deferred
             [=](int current_frame_number)
             {
-                CBFFile frame(format_template(filename_template, current_frame_number+frame_increment));
+                CBFDataReader frame(format_template(filename_template, current_frame_number + frame_increment));
                 assert(frame.dim1() == ny() and frame.dim2() == nx());
                 frame.read_data(buffer);
     }, current_frame_number);

@@ -12,8 +12,6 @@
 
 using namespace std;
 
-typedef float microstep_type;
-
 typedef float corrected_frame_dt;
 typedef float out_float_number;
 typedef float reciprocal_fractional_t;
@@ -118,12 +116,6 @@ public:
     ~ParserError() throw() {}
     string description;
 };
-
-//class UnknownFormat : std::exception {
-//public:
-//    UnknownFormat() {}
-//    ~UnknownFormat() throw() {}
-//};
 
 class ValueOutsideRange : std::exception {
 public:

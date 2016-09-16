@@ -14,9 +14,6 @@ bool file_exists(const string& filename) {
     return in.good();
 }
 
-
-
-
 /// Replaces ??? in the format file with the image number. Example whatever???.cbf, 2 -> whatever002.cbf
 string format_template(string format, size_t N) {
     smatch m;
