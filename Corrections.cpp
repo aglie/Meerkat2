@@ -215,6 +215,7 @@ float calculate_correction_coefficient(ExperimentalParameters & experiment, int 
     auto unit_scattering_vector = scattering_vector_mm.normalized();
 
 
+// TODO: CHECK THIS: it works differently than in MEERKAT1. it seems correct there not here! Is it possible the polarization plane components get scrumbled somewhere?
     auto air_transmission = transmission("Air", experiment.wavelength, scattering_vector_mm.norm());
     auto polarization_plane_normal=experiment.polarization_plane_normal.normalized();
     // A vector perpendicular to polarization plane and the wavevector

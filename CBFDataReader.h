@@ -5,7 +5,6 @@
 #ifndef MEERKAT2_CBFFILE_H
 #define MEERKAT2_CBFFILE_H
 
-#include <future>
 #include "misc.h"
 #include "cbf.h"
 

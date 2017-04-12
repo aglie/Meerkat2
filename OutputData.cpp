@@ -68,7 +68,7 @@ void writeFormatString(H5File& file) {
     ds.write(format, h5stringType);
 }
 
-// Ruins the dataset. Should only be used before quitting the program.
+/// WARNING: Ruins the dataset. Should only be used before quitting the program.
 void OutputData::save_data(string filename, ReconstructionParameters par) {
     for(size_t i=0; i<no_elements(); ++i)
         rebinned_data[i]/=no_pixels_rebinned[i];

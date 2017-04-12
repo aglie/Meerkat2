@@ -17,7 +17,8 @@ ImageLoader::ImageLoader(ReconstructionParameters par) :
     current_frame_number(par.first_image),
     filename_template (par.data_filename_template),
     last_frame_number (par.last_image),
-    frame_increment(par.frame_increment)
+    frame_increment(par.frame_increment),
+    mask_is_defined(false)
 {
     //get file size
 
@@ -67,8 +68,6 @@ bool ImageLoader::load_next_frame() {
     return true;
 }
 
-corrected_frame_dt ImageLoader::current_frame(size_t x, size_t y) {
-    return data[x * ny() + y];
-}
+
 
 

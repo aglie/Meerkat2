@@ -136,7 +136,11 @@ string throw_error(const string& filename, string error) {
 }
 
 
-const set<string> known_xds_formats = {" XPARM.XDS    VERSION Jun 17, 2015", " XPARM.XDS    VERSION Oct 15, 2015", " XPARM.XDS    VERSION May 1, 2016  BUILT=20160617"};
+const set<string> known_xds_formats =
+{" XPARM.XDS    VERSION Jun 17, 2015",
+ " XPARM.XDS    VERSION Oct 15, 2015",
+ " XPARM.XDS    VERSION May 1, 2016  BUILT=20160617",
+ " XPARM.XDS    VERSION Nov 1, 2016  BUILT=20161205"};
 
 void load_xparm(string filename, ExperimentalParameters & r) {
     ifstream in(filename);

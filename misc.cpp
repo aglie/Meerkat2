@@ -7,7 +7,6 @@
 #include <sstream>
 #include <iomanip>
 #include "misc.h"
-#include "Geometry.h"
 
 bool file_exists(const string& filename) {
     ifstream in(filename);

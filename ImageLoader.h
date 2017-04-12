@@ -16,8 +16,16 @@ class ImageLoader {
 public:
     ImageLoader(ReconstructionParameters par);
     bool load_next_frame();
-    bool should_reconstruct(size_t x, size_t y) {return current_frame(x,y) >= 0;}
-    corrected_frame_dt current_frame(size_t,size_t);
+    inline bool should_reconstruct(size_t x, size_t y) {
+        if(mask_is_defined)
+            return (current_frame(x,y) >= 0) && mask[xy2index(x,y)];
+        else
+            return current_frame(x,y) >= 0;
+    };
+
+    inline corrected_frame_dt current_frame(size_t x, size_t y) {
+        return data[xy2index(x, y)];
+    };
 
     ~ImageLoader() {
         free(data);
@@ -35,9 +43,15 @@ private:
     int current_frame_number, last_frame_number;
     int * data;
     int * buffer;
+    vector<bool> mask;
+    bool mask_is_defined;
     string filename_template;
     string current_frame_filename() {
         return format_template(filename_template, current_frame_number);
+    }
+
+    inline size_t xy2index(size_t x,size_t y) {
+        return x * ny() + y;
     }
 
 
