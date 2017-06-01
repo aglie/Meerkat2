@@ -43,7 +43,7 @@ private:
     int current_frame_number, last_frame_number;
     int * data;
     int * buffer;
-    vector<bool> mask;
+    vector<int> mask;
     bool mask_is_defined;
     string filename_template;
     string current_frame_filename() {

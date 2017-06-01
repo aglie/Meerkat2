@@ -214,6 +214,8 @@ ReconstructionParameters load_refinement_parameters(string filename) {
 
         if (keyword == "DATA_FILE_TEMPLATE")
             in >> par.data_filename_template;
+        else if (keyword == "MASK")
+            in >> par.mask_filename;
         else if (keyword == "FIRST_FRAME")
             in >> par.first_image;
         else if (keyword == "LAST_FRAME")

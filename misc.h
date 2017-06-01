@@ -117,6 +117,13 @@ public:
     string description;
 };
 
+class MaskError : std::exception {
+public:
+    MaskError(string description): description(description) {}
+    ~MaskError() throw() {}
+    string description;
+};
+
 class ValueOutsideRange : std::exception {
 public:
     ValueOutsideRange() {}

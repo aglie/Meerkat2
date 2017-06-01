@@ -300,7 +300,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    cout << "Meerkat2 v. 0.3" << endl;
+    cout << "Meerkat2 v. 0.31" << endl;
 
 //this might help with error messages when mmap memory allocation fails
 //#if (defined(__MACH__) && defined(__APPLE__))
@@ -343,6 +343,9 @@ int main(int argc, char* argv[]) {
     } catch (const CBFError& e) {
         cout << endl << "Error: file \"" << e.filename << "\" is not a valid cbf file. Use the program 2cbf from xds package to convert it to proper cbf format." << endl;
     } catch (const ParserError& e) {
+        cout << e.description;
+        return 0;
+    } catch (const MaskError& e) {
         cout << e.description;
         return 0;
     }

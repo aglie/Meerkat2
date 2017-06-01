@@ -37,6 +37,7 @@ struct ExperimentalParameters {
 };
 
 struct ReconstructionParameters {
+    string mask_filename;
     string data_filename_template;
     string xparm_filename;
     size_t first_image;
@@ -57,6 +58,7 @@ struct ReconstructionParameters {
             data_filename_template(""),
             xparm_filename(""),
             output_filename(""),
+            mask_filename(""),
             first_image(1),
             last_image(numeric_limits<size_t>::max()),
             number_of_pixels{701,701,701},

@@ -26,7 +26,7 @@ set(SOURCE_FILES
         Corrections.cpp
         Corrections.h
         CBFDataReader.h
-        CBFDataReader.cpp)
+        CBFDataReader.cpp Hdf5HelperFuncitons.h Hdf5HelperFunctions.cpp)
 add_library(meerkat2-lib ${SOURCE_FILES})
 add_executable(Meerkat2 main.cpp)
 target_link_libraries(Meerkat2 meerkat2-lib libcbf.a ${HDF5_LIBRARIES})

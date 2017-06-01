@@ -11,7 +11,7 @@
 #include "ImageLoader.h"
 #include "cbf.h"
 #include "CBFDataReader.h"
-
+#include "Hdf5HelperFuncitons.h"
 
 ImageLoader::ImageLoader(ReconstructionParameters par) :
     current_frame_number(par.first_image),
@@ -33,6 +33,23 @@ ImageLoader::ImageLoader(ReconstructionParameters par) :
     buffer = (int *)malloc(sizeof(int)*m_dim1*m_dim2); //Tick-tock buffer.
     // One way to increase speed would be to read and reconstruct several images at a time
     // possibly it will be cool to shuffle bytes by staggering them together along z??? or actually it should not.
+
+    if(par.mask_filename != "") {
+        // load mask
+        if(!file_exists(par.mask_filename)) {
+            throw FileNotFound(par.mask_filename);
+        }
+
+        H5File file(par.mask_filename, H5F_ACC_RDONLY);
+        auto sz = getDatasetDimensions(file, "data");
+        if(sz[0]!=m_dim2 || sz[1]!=m_dim1) {
+            std::stringstream message;
+            message << "Error with input mask dimensions. Expect " << m_dim1 << "x" << m_dim2 << " found " << sz[0] <<"x" << sz[1] << "." << endl;
+            throw MaskError(message.str());
+        }
+        mask = readVector<int>(file, "data");
+        mask_is_defined = true;
+    }
 
     load_frame_to_buffer();
 }
