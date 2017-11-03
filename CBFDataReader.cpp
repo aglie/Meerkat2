@@ -23,7 +23,6 @@ CBFDataReader::CBFDataReader(string inp_filename) : m_filename(inp_filename) {
 
     size_t padding;
 
-
     throws_cbf_errors(cbf_make_handle(&incbf));
     throws_cbf_errors(cbf_read_file(incbf, in, MSG_DIGEST));
     throws_cbf_errors(cbf_rewind_datablock(incbf));

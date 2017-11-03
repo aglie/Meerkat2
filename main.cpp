@@ -13,8 +13,6 @@
 //#include <malloc.h>
 //#endif
 
-
-
 using namespace std;
 
 class ImageDataIterator {
