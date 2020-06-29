@@ -286,8 +286,8 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         throw_undefined_keyword(filename, "XPARM_FILE");
 
     for(int i=0; i<3; ++i)
-        if(par.microsteps <= 0)
-            throw_error(filename, "MICROSTEPS should be positive");
+        if(par.microsteps[i] <= 0)
+            throw_error(filename, "MICROSTEPS must be positive");
 
     for(int i=0; i<2; ++i)
         if(par.microsteps[i] > 1)
