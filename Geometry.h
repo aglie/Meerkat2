@@ -97,9 +97,9 @@ inline vec3 det2hkl(ExperimentalParameters & p,
 
 inline void to_index(ReconstructionParameters& par,
         vec3 hkl, int* indices) {
-    indices[0] = (hkl[0]-par.lower_limits[0])/par.step_sizes[0];
-    indices[1] = (hkl[1]-par.lower_limits[1])/par.step_sizes[1];
-    indices[2] = (hkl[2]-par.lower_limits[2])/par.step_sizes[2];
+    indices[0] = round( (hkl[0]-par.lower_limits[0])/par.step_sizes[0]);
+    indices[1] = round( (hkl[1]-par.lower_limits[1])/par.step_sizes[1]);
+    indices[2] = round( (hkl[2]-par.lower_limits[2])/par.step_sizes[2]);
 }
 
 inline void get_index(

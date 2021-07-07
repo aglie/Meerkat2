@@ -135,7 +135,6 @@ string throw_error(const string& filename, string error) {
     throw ParserError(err_text.str());
 }
 
-
 const set<string> known_xds_formats =
 {" XPARM.XDS    VERSION Jun 17, 2015",
  " XPARM.XDS    VERSION Oct 15, 2015",
@@ -153,6 +152,11 @@ void load_xparm(string filename, ExperimentalParameters & r) {
         cout <<
         "Warning: unknown version of XPARM.XDS file. This version has not been tested yet, use Meerkat at your own risk.\n";
 
+
+    //TODO: XPARM.XDS is inconsistent with GXPARM.XDS
+    //TODO: XPARM has the xcenter ycenter off by +1 pixel, subtract
+    //TODO: properly test it, has it improved?
+    //TODO, never: load SPOT.XDS, sort only those which are indexed and rerefine orientation matrix.
 
     in >> r.starting_frame >> r.starting_angle >> r.oscillation_angle >>
     r.oscillation_axis[0] >> r.oscillation_axis[1] >> r.oscillation_axis[2] >>
