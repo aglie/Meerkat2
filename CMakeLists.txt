@@ -10,7 +10,7 @@ set(HDF5_LIBRARIES hdf5_hl_cpp hdf5_cpp hdf5_hl hdf5 szip z )
 include_directories(${LIBHDF5_DIR}/include ${LIBCBF_DIR}/include)
 link_directories(${LIBHDF5_DIR}/lib ${LIBCBF_DIR}/lib)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -march=native") #
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O0") #
 
 set(SOURCE_FILES
         misc.cpp
@@ -30,6 +30,10 @@ set(SOURCE_FILES
 add_library(meerkat2-lib ${SOURCE_FILES})
 add_executable(Meerkat2 main.cpp)
 target_link_libraries(Meerkat2 meerkat2-lib libcbf.a ${HDF5_LIBRARIES})
+
+add_executable(TestYellFormat TestYellFormat.cpp)
+target_link_libraries(TestYellFormat meerkat2-lib ${HDF5_LIBRARIES})
+
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/lib/cxxtest/build_tools/cmake")
 find_package(CxxTest)
