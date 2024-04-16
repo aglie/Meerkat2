@@ -50,6 +50,10 @@ void reconstruct_data(ReconstructionParameters& par) {
             inv_corrections[x*Ny+y] = 1/calculate_correction_coefficient(exp, x, y);
         }
 
+    for(int i=0; i<3; ++i) {
+        par.inv_step_sizes[i] = par.step_sizes[i];
+    }
+
     while(measured_frames.load_next_frame()) {
         auto t2 = chrono::system_clock::now();
         auto dms = chrono::duration_cast<chrono::milliseconds>(t2 - t1);
@@ -99,7 +103,7 @@ void reconstruct_data(ReconstructionParameters& par) {
                     for(size_t x=xt; x<xt+tile_size and x<Nx; ++x )
                         for(size_t y=yt; y<yt+tile_size and y<Ny; ++y)
                             if(measured_frames.should_reconstruct(x, y)) {
-                                corrected_frame_dt I = measured_frames.current_frame(x, y) / inv_corrections[x*Ny+y];
+                                corrected_frame_dt I = measured_frames.current_frame(x, y) * inv_corrections[x*Ny+y];
                                 for(size_t microstep=0; microstep < ms_f.number; microstep += 1)
                                 {
                                     int indices[3];

@@ -45,6 +45,7 @@ struct ReconstructionParameters {
     size_t number_of_pixels[3];
     reciprocal_fractional_t lower_limits[3];
     reciprocal_fractional_t step_sizes[3];
+    reciprocal_fractional_t inv_step_sizes[3];
     bool reconstruct_in_orthonormal_basis;
     //measured_pixels in some format - missing in the baseline
     size_t microsteps[3];
