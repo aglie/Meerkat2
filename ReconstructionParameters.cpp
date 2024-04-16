@@ -162,9 +162,9 @@ void load_xparm(string filename, ExperimentalParameters & r) {
     r.oscillation_axis[0] >> r.oscillation_axis[1] >> r.oscillation_axis[2] >>
     r.wavelength >> r.wavevector[0] >> r.wavevector[1] >> r.wavevector[2] >>
     r.space_group_nr >> r.cell[0] >> r.cell[1] >> r.cell[2] >> r.cell[3] >> r.cell[4] >> r.cell[5] >>
-    r.cell_vectors[0][0] >> r.cell_vectors[0][1] >> r.cell_vectors[0][2] >>
-    r.cell_vectors[1][0] >> r.cell_vectors[1][1] >> r.cell_vectors[1][2] >>
-    r.cell_vectors[2][0] >> r.cell_vectors[2][1] >> r.cell_vectors[2][2] >>
+    r.cell_vectors(0, 0) >> r.cell_vectors(0, 1) >> r.cell_vectors(0, 2) >>
+    r.cell_vectors(1, 0) >> r.cell_vectors(1, 1) >> r.cell_vectors(1, 2) >>
+    r.cell_vectors(2, 0) >> r.cell_vectors(2, 1) >> r.cell_vectors(2, 2) >>
     // We are changing x and y directions because xds uses fortran array notations, while we use C
     r.number_of_detector_segments >> r.NY >> r.NX >> r.pixel_size_y >> r.pixel_size_x >>
     r.y_center >> r.x_center >> r.distance_to_detector >>

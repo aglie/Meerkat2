@@ -3,14 +3,15 @@ project(Meerkat2)
 
 set(LIBCBF_DIR lib/CBFlib-0.9.3.1)
 set(LIBHDF5_DIR lib/hdf5)
+set(LIBEIGEN_DIR lib/eigen-3.4.0)
 
 set(HDF5_LIBRARIES hdf5_hl_cpp hdf5_cpp hdf5_hl hdf5 szip z )
 
 #I am using slightly newer LIBHDF5 than the one in cbf lib
-include_directories(${LIBHDF5_DIR}/include ${LIBCBF_DIR}/include)
+include_directories(${LIBHDF5_DIR}/include ${LIBCBF_DIR}/include ${LIBEIGEN_DIR})
 link_directories(${LIBHDF5_DIR}/lib ${LIBCBF_DIR}/lib)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O0") #-O0
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") #-O0
 
 set(SOURCE_FILES
         misc.cpp

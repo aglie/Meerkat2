@@ -19,15 +19,16 @@ inline void rotvec2mat(vec3& u, float phi, matrix_3x3& res) {
     auto uy = u[1];
     auto uz = u[2];
 
-    res[0][0] = t * ux * ux + c;
-    res[0][1] = t * ux * uy - s * uz;
-    res[0][2] = t * ux * uz + s * uy;
-    res[1][0] = t * ux * uy + s * uz;
-    res[1][1] = t * uy * uy + c;
-    res[1][2] = t * uy * uz - s * ux;
-    res[2][0] = t * ux * uz - s * uy;
-    res[2][1] = t * uy * uz + s * ux;
-    res[2][2] = t * uz * uz + c;
+    res(0, 0) = t * ux * ux + c;
+    res(0, 1) = t * ux * uy - s * uz;
+    res(0, 2) = t * ux * uz + s * uy;
+    res(1, 0) = t * ux * uy + s * uz;
+    res(1, 1) = t * uy * uy + c;
+    res(1, 2) = t * uy * uz - s * ux;
+    res(2, 0) = t * ux * uz - s * uy;
+    res(2, 1) = t * uy * uz + s * ux;
+    res(2, 2) = t * uz * uz + c;
+
 }
 
 
@@ -76,17 +77,16 @@ inline vec3 rotate_to_frame(
     return hkl;
 }
 
-//template<typename T>
-//inline matrix_3x3 pixel_to_hkl_matrix(
-//        ExperimentalParameters & p,
-//        vec3 s,
-//        const T& frame_no)
-//{
-//    auto phi = (frame_no - p.starting_frame) * p.oscillation_angle + p.starting_angle;
-//    matrix_3x3 rotation_matrix, res;
-//    rotvec2mat(p.oscillation_axis, -2 * PI_F * phi / 360, rotation_matrix);
-//    return dot(p.cell_vectors, rotation_matrix, res);
-//}
+template<typename T>
+inline matrix_3x3 pixel_to_hkl_matrix(
+        ExperimentalParameters & p,
+        const T& frame_no)
+{
+    auto phi = (frame_no - p.starting_frame) * p.oscillation_angle + p.starting_angle;
+    matrix_3x3 rotation_matrix;
+    rotvec2mat(p.oscillation_axis, -2 * PI_F * phi / 360, rotation_matrix);
+    return p.cell_vectors* rotation_matrix;
+}
 
 template<typename T1, typename T2>
 inline vec3 det2lab(ExperimentalParameters & p,

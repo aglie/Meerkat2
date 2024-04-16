@@ -41,13 +41,13 @@ void reconstruct_data(ReconstructionParameters& par) {
 
     //cache scattering vectors of each pixel without rotating
     vector<vec3>  scattering_vectors(Nx*Ny);
-    vector<float> corrections(Nx*Ny);
+    vector<float> inv_corrections(Nx*Ny); //TODO: change to corrections, move inverse to the definition of the corrections function
 
 
     for(size_t x=0; x<Nx; ++x )
         for(size_t y=0; y<Ny; ++y) {
             scattering_vectors[x*Ny+y] = project_to_evald_sphere(exp, x, y);
-            corrections[x*Ny+y] = calculate_correction_coefficient(exp, x, y);
+            inv_corrections[x*Ny+y] = 1/calculate_correction_coefficient(exp, x, y);
         }
 
     while(measured_frames.load_next_frame()) {
@@ -58,21 +58,24 @@ void reconstruct_data(ReconstructionParameters& par) {
 
         t1 = chrono::system_clock::now();
 
-        const size_t tile_size=4;
-        for(size_t xt=0; xt<Nx; xt+=tile_size)
-            for(size_t yt=0; yt<Ny; yt+=tile_size)
-                for(size_t x=xt; x<xt+tile_size and x<Nx; ++x )
-                    for(size_t y=yt; y<yt+tile_size and y<Ny; ++y)
-                        if(measured_frames.should_reconstruct(x, y)) {
-                            corrected_frame_dt I = measured_frames.current_frame(x, y) / corrections[x*Ny+y];
-                                for(auto microstep_df=ms_f.start; microstep_df<ms_f.end; microstep_df+=ms_f.inc) {
+
+
+
+        if(par.microsteps[2] == 1) //  should be kicking away frame microstepping and removing one indirection in the orientation matrix. DOesn't seem to add anything to the speed.
+        {
+            auto lab2hkl_mat = pixel_to_hkl_matrix(exp, measured_frames.curernt_frame_no());
+            const size_t tile_size=4;
+            for(size_t xt=0; xt<Nx; xt+=tile_size)
+                for(size_t yt=0; yt<Ny; yt+=tile_size)
+                    for(size_t x=xt; x<xt+tile_size and x<Nx; ++x )
+                        for(size_t y=yt; y<yt+tile_size and y<Ny; ++y)
+                            if(measured_frames.should_reconstruct(x, y)) {
+                                corrected_frame_dt I = measured_frames.current_frame(x, y) * inv_corrections[x*Ny+y];
+                                {
                                     int indices[3];
                                     //get_index(exp, par, x, y, measured_frames.curernt_frame_no(), indices);
                                     to_index(par,
-                                             exp.cell_vectors * rotate_to_frame(exp, scattering_vectors[x*Ny+y], measured_frames.curernt_frame_no()+microstep_df),
-                                             indices);
-                                     to_index(par,
-                                             exp.cell_vectors * rotate_to_frame(exp, scattering_vectors[x*Ny+y], measured_frames.curernt_frame_no()+microstep_df),
+                                             lab2hkl_mat*scattering_vectors[x*Ny+y],
                                              indices);
 
                                     if(indices_within_bounds(par, indices)) {
@@ -81,7 +84,39 @@ void reconstruct_data(ReconstructionParameters& par) {
                                     }
                                 }
 
-                        }
+                            }
+        }
+        else
+        {
+            vector<matrix_3x3> lab2hkl_mat;
+            for(auto microstep_df=ms_f.start; microstep_df<ms_f.end; microstep_df+=ms_f.inc) {
+                lab2hkl_mat.push_back(pixel_to_hkl_matrix(exp, measured_frames.curernt_frame_no()+microstep_df));
+            }
+
+            const size_t tile_size=4;
+            for(size_t xt=0; xt<Nx; xt+=tile_size)
+                for(size_t yt=0; yt<Ny; yt+=tile_size)
+                    for(size_t x=xt; x<xt+tile_size and x<Nx; ++x )
+                        for(size_t y=yt; y<yt+tile_size and y<Ny; ++y)
+                            if(measured_frames.should_reconstruct(x, y)) {
+                                corrected_frame_dt I = measured_frames.current_frame(x, y) / inv_corrections[x*Ny+y];
+                                for(size_t microstep=0; microstep < ms_f.number; microstep += 1)
+                                {
+                                    int indices[3];
+                                    //get_index(exp, par, x, y, measured_frames.curernt_frame_no(), indices);
+                                    to_index(par,
+                                             lab2hkl_mat[microstep]*scattering_vectors[x*Ny+y],
+                                             indices);
+
+                                    if(indices_within_bounds(par, indices)) {
+                                        out.rebinned_data_at(indices[0],indices[1],indices[2])+=I;
+                                        out.no_pixels_rebinned_at(indices[0],indices[1],indices[2])+=1;
+                                    }
+                                }
+
+                            }
+        }
+
     }
 
     cout << "Writing out " << par.output_filename << endl;
@@ -302,7 +337,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    cout << "Meerkat2 v. 0.32" << endl;
+    cout << "Meerkat2 v. 0.33" << endl;
 
 //this might help with error messages when mmap memory allocation fails
 //#if (defined(__MACH__) && defined(__APPLE__))

@@ -26,7 +26,7 @@ DataType getH5Type<size_t> () {
 }
 
 void writeVector(H5File& file, string datasetName, vec3 v) {
-    writeVector<float,3>(file, datasetName, v.data);
+    writeVector<float,3>(file, datasetName, v.data());
 }
 
 void writeYellFormatString(H5File& file) {
