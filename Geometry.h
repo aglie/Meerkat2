@@ -76,6 +76,18 @@ inline vec3 rotate_to_frame(
     return hkl;
 }
 
+//template<typename T>
+//inline matrix_3x3 pixel_to_hkl_matrix(
+//        ExperimentalParameters & p,
+//        vec3 s,
+//        const T& frame_no)
+//{
+//    auto phi = (frame_no - p.starting_frame) * p.oscillation_angle + p.starting_angle;
+//    matrix_3x3 rotation_matrix, res;
+//    rotvec2mat(p.oscillation_axis, -2 * PI_F * phi / 360, rotation_matrix);
+//    return dot(p.cell_vectors, rotation_matrix, res);
+//}
+
 template<typename T1, typename T2>
 inline vec3 det2lab(ExperimentalParameters & p,
                     const T1& x,

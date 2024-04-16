@@ -71,6 +71,8 @@ void swap_a_for_b(T& a, T& b) {
     b=t;
 }
 
+
+// TODO: check this works with stepping over some frames
 bool ImageLoader::load_next_frame() {
     current_frame_number+=frame_increment;
     if (current_frame_number > last_frame_number)

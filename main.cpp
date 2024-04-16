@@ -71,6 +71,10 @@ void reconstruct_data(ReconstructionParameters& par) {
                                     to_index(par,
                                              exp.cell_vectors * rotate_to_frame(exp, scattering_vectors[x*Ny+y], measured_frames.curernt_frame_no()+microstep_df),
                                              indices);
+                                     to_index(par,
+                                             exp.cell_vectors * rotate_to_frame(exp, scattering_vectors[x*Ny+y], measured_frames.curernt_frame_no()+microstep_df),
+                                             indices);
+
                                     if(indices_within_bounds(par, indices)) {
                                         out.rebinned_data_at(indices[0],indices[1],indices[2])+=I;
                                         out.no_pixels_rebinned_at(indices[0],indices[1],indices[2])+=1;
@@ -298,7 +302,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    cout << "Meerkat2 v. 0.31" << endl;
+    cout << "Meerkat2 v. 0.32" << endl;
 
 //this might help with error messages when mmap memory allocation fails
 //#if (defined(__MACH__) && defined(__APPLE__))

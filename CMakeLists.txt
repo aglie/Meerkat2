@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.10)
 project(Meerkat2)
 
 set(LIBCBF_DIR lib/CBFlib-0.9.3.1)
@@ -10,7 +10,7 @@ set(HDF5_LIBRARIES hdf5_hl_cpp hdf5_cpp hdf5_hl hdf5 szip z )
 include_directories(${LIBHDF5_DIR}/include ${LIBCBF_DIR}/include)
 link_directories(${LIBHDF5_DIR}/lib ${LIBCBF_DIR}/lib)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O0") #
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O0") #-O0
 
 set(SOURCE_FILES
         misc.cpp
