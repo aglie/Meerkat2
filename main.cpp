@@ -62,33 +62,24 @@ void reconstruct_data(ReconstructionParameters& par) {
 
         t1 = chrono::system_clock::now();
 
-
-
-
         if(par.microsteps[2] == 1) //  should be kicking away frame microstepping and removing one indirection in the orientation matrix. DOesn't seem to add anything to the speed.
         {
             auto lab2hkl_mat = pixel_to_hkl_matrix(exp, measured_frames.curernt_frame_no());
-            const size_t tile_size=4;
-            for(size_t xt=0; xt<Nx; xt+=tile_size)
-                for(size_t yt=0; yt<Ny; yt+=tile_size)
-                    for(size_t x=xt; x<xt+tile_size and x<Nx; ++x )
-                        for(size_t y=yt; y<yt+tile_size and y<Ny; ++y)
-                            if(measured_frames.should_reconstruct(x, y)) {
-                                corrected_frame_dt I = measured_frames.current_frame(x, y) * inv_corrections[x*Ny+y];
-                                {
-                                    int indices[3];
-                                    //get_index(exp, par, x, y, measured_frames.curernt_frame_no(), indices);
-                                    to_index(par,
-                                             lab2hkl_mat*scattering_vectors[x*Ny+y],
-                                             indices);
+            for(size_t ind=0; ind<Nx*Ny; ind+=1)
+                    if(measured_frames.should_reconstruct(ind)) {
+                        corrected_frame_dt I = measured_frames.current_frame(ind) * inv_corrections[ind];
+                        {
+                            int indices[3];
+                            to_index(par,
+                                     lab2hkl_mat*scattering_vectors[ind],
+                                     indices);
 
-                                    if(indices_within_bounds(par, indices)) {
-                                        out.rebinned_data_at(indices[0],indices[1],indices[2])+=I;
-                                        out.no_pixels_rebinned_at(indices[0],indices[1],indices[2])+=1;
-                                    }
-                                }
-
+                            if(indices_within_bounds(par, indices)) {
+                                out.rebinned_data_at(indices[0],indices[1],indices[2]) += I;
+                                out.no_pixels_rebinned_at(indices[0],indices[1],indices[2]) += 1;
                             }
+                        }
+                    }
         }
         else
         {
