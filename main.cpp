@@ -51,7 +51,7 @@ void reconstruct_data(ReconstructionParameters& par) {
         }
 
     for(int i=0; i<3; ++i) {
-        par.inv_step_sizes[i] = par.step_sizes[i];
+        par.inv_step_sizes[i] = 1/par.step_sizes[i];
     }
 
     while(measured_frames.load_next_frame()) {
