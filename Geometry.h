@@ -111,7 +111,8 @@ inline vec3 to_index(const ReconstructionParameters& par,
         const vec3 hkl, int* res ) {
 
     // round operation is implicit in conversion which applies floor, together with floor it makes it correctly
-    // TODO: test that it works
+    // TODO: SOMTHING CHAGED, test it thoroughly
+    // Check part with microstepping thoroughly!
     res[0] = int((hkl[0] - par.lower_limits[0]) * par.inv_step_sizes[0] + 0.5);
     res[1] = int((hkl[1] - par.lower_limits[1]) * par.inv_step_sizes[1] + 0.5);
     res[2] = int((hkl[2] - par.lower_limits[2]) * par.inv_step_sizes[2] + 0.5);

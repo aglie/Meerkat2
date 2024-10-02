@@ -15,7 +15,6 @@ public:
             size{par.number_of_pixels[0],par.number_of_pixels[1],par.number_of_pixels[2]},
             rebinned_data(par.number_of_pixels[0]*par.number_of_pixels[1]*par.number_of_pixels[2]),
             no_pixels_rebinned(par.number_of_pixels[0]*par.number_of_pixels[1]*par.number_of_pixels[2])
-
     {
     }
     out_float_number& rebinned_data_at(int hi, int ki, int li) {return rebinned_data[hkli2i(hi,ki,li)];}

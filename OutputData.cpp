@@ -20,7 +20,7 @@ void OutputData::save_data(string filename, ReconstructionParameters par) {
 
     // Write out the grid settings
     writeVector<reciprocal_fractional_t,3> (file, "lower_limits", par.lower_limits);
-    writeConstant(file, "is_direct", false);
+    writeConstant<int>(file, "is_direct", 0);
     writeVector<reciprocal_fractional_t,3>(file, "step_sizes", par.step_sizes);
     writeVector<float,6> (file, "unit_cell", par.exp.cell);
     writeYellFormatString(file);
