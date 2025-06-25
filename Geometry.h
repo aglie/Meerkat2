@@ -107,7 +107,7 @@ inline vec3 det2hkl(ExperimentalParameters & p,
 }
 
 
-inline vec3 to_index(const ReconstructionParameters& par,
+inline void to_index(const ReconstructionParameters& par,
         const vec3 hkl, int* res ) {
 
     // round operation is implicit in conversion which applies floor, together with floor it makes it correctly

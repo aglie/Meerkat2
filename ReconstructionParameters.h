@@ -31,7 +31,7 @@ struct ExperimentalParameters {
     float detector_thickness;
 
     ExperimentalParameters() :
-            polarization_plane_normal{0, 1, 0},
+            polarization_plane_normal(0, 1, 0),
             polarization_factor(0.5)
     {}
 };
@@ -39,6 +39,7 @@ struct ExperimentalParameters {
 struct ReconstructionParameters {
     string mask_filename;
     string data_filename_template;
+    string hdf5_dataset_name;
     string xparm_filename;
     size_t first_image;
     size_t last_image;
@@ -58,6 +59,7 @@ struct ReconstructionParameters {
     ReconstructionParameters() :
             data_filename_template(""),
             xparm_filename(""),
+            hdf5_dataset_name(""),
             output_filename(""),
             mask_filename(""),
             first_image(1),

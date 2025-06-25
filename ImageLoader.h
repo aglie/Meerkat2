@@ -12,7 +12,6 @@
 
 
 class ImageLoader {
-
 public:
     ImageLoader(ReconstructionParameters par);
     bool load_next_frame();

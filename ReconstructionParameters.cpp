@@ -148,9 +148,9 @@ void load_xparm(string filename, ExperimentalParameters & r) {
         throw FileNotFound(filename);
 
     getline(in, r.format);
-    if (!isIn(r.format, known_xds_formats))
-        cout <<
-        "Warning: unknown version of XPARM.XDS file. This version has not been tested yet, use Meerkat at your own risk.\n";
+    // if (!isIn(r.format, known_xds_formats))
+    //     cout <<
+    //     "Warning: unknown version of XPARM.XDS file. This version has not been tested yet, use Meerkat at your own risk.\n";
 
 
     //TODO: XPARM.XDS is inconsistent with GXPARM.XDS
@@ -204,7 +204,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
     reciprocal_fractional_t upper_limits[3];
     bool upper_limits_defined = false;
 
-    string keyword;
+    std::string keyword;
 
     while (!in.eof()) {
         in >> keyword;
@@ -215,6 +215,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
             getline(in, keyword);
             continue;
         }
+
 
         if (keyword == "DATA_FILE_TEMPLATE")
             in >> par.data_filename_template;
@@ -231,6 +232,8 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         else if (keyword == "UPPER_LIMITS") {
             in >> upper_limits[0] >> upper_limits[1] >> upper_limits[2];
             upper_limits_defined=true;
+        } else if(keyword == "HDF5_DATASET_NAME") {
+            in >> par.hdf5_dataset_name;
         }
         else if (keyword == "STEP_SIZES")
             in >> par.step_sizes[0] >> par.step_sizes[1] >> par.step_sizes[2];

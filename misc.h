@@ -16,13 +16,13 @@ using namespace std;
 typedef float corrected_frame_dt;
 typedef float out_float_number;
 typedef float reciprocal_fractional_t;
-typedef Eigen::Matrix3<reciprocal_fractional_t> matrix_3x3;
+typedef Eigen::Matrix<reciprocal_fractional_t,3,3> matrix_3x3;
 
 const float  PI_F=3.14159265358979f;
 
 typedef float vec6[6];
 
-typedef Eigen::Vector3<reciprocal_fractional_t > vec3;
+typedef Eigen::Matrix<reciprocal_fractional_t,3,1> vec3;
 
 template<typename T>
 inline T square(T a){
