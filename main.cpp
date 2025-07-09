@@ -6,6 +6,7 @@
 #include "Corrections.h"
 #include "AbstractImageLoader.h"
 #include "ImageLoaderFactory.h"
+#include <chrono>
 
 //this might help with error messages when mmap memory allocation fails
 //#if (defined(__MACH__) && defined(__APPLE__))

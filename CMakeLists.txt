@@ -5,6 +5,8 @@ include(cmake/hdf5.cmake)
 include(cmake/CBFlib.cmake)
 
 include(ExternalProject)
+set(LIBEIGEN_DIR ${CMAKE_BINARY_DIR}/eigen-install)
+
 ExternalProject_Add(
         eigen
         URL  https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
@@ -14,12 +16,12 @@ ExternalProject_Add(
         CMAKE_ARGS
         #-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/eigen-install
+        -DCMAKE_INSTALL_PREFIX=${LIBEIGEN_DIR}
 )
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(${LIBCBF_DIR}/include ${LIBEIGEN_DIR})
+include_directories(${LIBCBF_DIR}/include ${LIBEIGEN_DIR}/include/eigen3)
 link_directories(${LIBHDF5_DIR}/lib ${LIBCBF_DIR}/lib)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") #-O0
@@ -59,11 +61,11 @@ set_target_properties(Meerkat2 PROPERTIES
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF
 )
-
-target_link_libraries(Meerkat2 meerkat2-lib ) #libcbf.a ${HDF5_LIBRARIES}
+add_dependencies(meerkat2-lib eigen)
+target_link_libraries(Meerkat2 meerkat2-lib) #libcbf.a ${HDF5_LIBRARIES}
 
 DownloadHDF5For(meerkat2-lib)
-DownloadCBFFor(meerkat2-lib)
+#DownloadCBFFor(meerkat2-lib)
 
 #add_executable(TestYellFormat TestYellFormat.cpp)
 #target_link_libraries(TestYellFormat meerkat2-lib ${HDF5_LIBRARIES})

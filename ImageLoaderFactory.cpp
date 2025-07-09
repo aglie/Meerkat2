@@ -9,7 +9,7 @@
 #include <memory>
 
 std::unique_ptr<AbstractImageLoader> createImageLoader(ReconstructionParameters par) {
-    std::string extension = std::filesystem::path(par.data_filename_template).extension();
+    std::string extension = std::filesystem::path(par.data_filename_template).extension().string();
     if (extension == ".cbf") {
 //        return std::make_unique<CBFImageLoader>(par);
         return NULL;

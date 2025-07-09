@@ -10,6 +10,7 @@ using namespace H5;
 #include <stdexcept>
 #include <iostream>
 #include <filesystem>
+#include <cassert>
 
 //TODO: delete this once everything works
 //std::pair<std::string, std::string> parseHDF5FilenameAndDataset(const std::string& filename_and_dataset) {
@@ -27,6 +28,7 @@ using namespace H5;
 #include "H5PLextern.h"
 #include "bitshuffle/bitshuffle.h"
 #include "bitshuffle/bshuf_h5filter.h"
+#include <cassert>
 
 
 
