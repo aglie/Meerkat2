@@ -39,7 +39,6 @@ set(SOURCE_FILES
         ReconstructionParameters.cpp
         Corrections.cpp
         Corrections.h
-        #CBFDataReader.cpp
         Hdf5HelperFuncitons.h
         Hdf5HelperFunctions.cpp
         HDFImageLoader.cpp

@@ -317,11 +317,11 @@ void reconstruct_data(ReconstructionParameters& par) {
 ///Quickly checks all required frames exist. If one does not thorows FileNotFound exception
 void check_all_frames_exist(const ReconstructionParameters& par) {
     //TODO: move this check to abstract loader, since it is hard to figure out from hdf5 whether it is all good
-//    for(int i=par.first_image; i<=par.last_image; i+=par.frame_increment) {
-//        string filename = format_template(par.data_filename_template, i);
-//        if(not file_exists(filename))
-//            throw FileNotFound(filename);
-//    }
+    for(int i=par.first_image; i<=par.last_image; i+=par.frame_increment) {
+        string filename = format_template(par.data_filename_template, i);
+        if(not file_exists(filename))
+            throw FileNotFound(filename);
+    }
 }
 
 
