@@ -30,8 +30,6 @@ using namespace H5;
 #include "bitshuffle/bshuf_h5filter.h"
 #include <cassert>
 
-
-
 HDFDataReader::HDFDataReader(string filename, string dataset_name) :
     m_filename(filename), m_dataset_name(dataset_name) {
 
@@ -40,8 +38,6 @@ HDFDataReader::HDFDataReader(string filename, string dataset_name) :
         std::cerr << "Error: File does not exist: " << filename << std::endl;
         throw std::runtime_error("File not found");
     }
-
-
 
 // Read in the files
     try {
@@ -104,7 +100,6 @@ HDFDataReader::HDFDataReader(string filename, string dataset_name) :
 
 void HDFDataReader::read_frame(int frame_no, int* out) {
     DataSpace dataspace = dataset.getSpace();
-
 /*
  * Define hyperslab in the dataset; implicitly giving stride and
  * block NULL.

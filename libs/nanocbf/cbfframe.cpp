@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "cbfframe.h"
+#include "CBFFrame.h"
 #include <fstream>
 #include <sstream>
 #include <regex>
@@ -31,17 +31,17 @@
 
 namespace nanocbf {
     // CBF magic number and tail
-    const std::vector<uint8_t> CbfFrame::CBF_MAGIC = {0x0C, 0x1A, 0x04, 0xD5};
-    const std::string CbfFrame::CBF_TAIL = std::string(4095, '\0') + "\r\n--CIF-BINARY-FORMAT-SECTION----\r\n;\r\n\r\n";
+    const std::vector<uint8_t> CBFFrame::CBF_MAGIC = {0x0C, 0x1A, 0x04, 0xD5};
+    const std::string CBFFrame::CBF_TAIL = std::string(4095, '\0') + "\r\n--CIF-BINARY-FORMAT-SECTION----\r\n;\r\n\r\n";
 
-    CbfFrame::CbfFrame() : width(0), height(0) {}
-    CbfFrame::CbfFrame(const std::string& filename) : width(0), height(0) {
+    CBFFrame::CBFFrame() : width(0), height(0) {}
+    CBFFrame::CBFFrame(const std::string& filename) : width(0), height(0) {
       read(filename);
     }
 
-    CbfFrame::~CbfFrame() {}
+    CBFFrame::~CBFFrame() {}
 
-    bool CbfFrame::read(const std::string& filename) {
+    bool CBFFrame::read(const std::string& filename) {
         std::ifstream file(filename, std::ios::binary);
         if (!file.is_open()) {
             m_error = "Could not open file: " + filename;
@@ -130,7 +130,7 @@ namespace nanocbf {
         return true;
     }
 
-    bool CbfFrame::write(const std::string& filename) const {
+    bool CBFFrame::write(const std::string& filename) const {
         if (data.empty() || width == 0 || height == 0) {
             return false;
         }
@@ -168,7 +168,7 @@ namespace nanocbf {
     }
 
 
-    bool CbfFrame::parseBinaryInfo(const std::string& header, int& width, int& height, int& dataSize) const {
+    bool CBFFrame::parseBinaryInfo(const std::string& header, int& width, int& height, int& dataSize) {
         std::regex widthRegex(R"(X-Binary-Size-Fastest-Dimension:\s+(\d+))");
         std::regex heightRegex(R"(X-Binary-Size-Second-Dimension:\s+(\d+))");
         std::regex sizeRegex(R"(X-Binary-Size:\s+(\d+))");
@@ -177,19 +177,19 @@ namespace nanocbf {
         std::smatch match;
 
         if (!std::regex_search(header, match, widthRegex)) {
-            const_cast<CbfFrame*>(this)->m_error = "Could not find width in header";
+            m_error = "Could not find width in header";
             return false;
         }
         width = std::stoi(match[1].str());
 
         if (!std::regex_search(header, match, heightRegex)) {
-            const_cast<CbfFrame*>(this)->m_error = "Could not find height in header";
+            m_error = "Could not find height in header";
             return false;
         }
         height = std::stoi(match[1].str());
 
         if (!std::regex_search(header, match, sizeRegex)) {
-            const_cast<CbfFrame*>(this)->m_error = "Could not find data size in header";
+            m_error = "Could not find data size in header";
             return false;
         }
         dataSize = std::stoi(match[1].str());
@@ -204,7 +204,7 @@ namespace nanocbf {
         return true;
     }
 
-    std::vector<uint8_t> CbfFrame::compressData(const std::vector<int32_t>& data) const {
+    std::vector<uint8_t> CBFFrame::compressData(const std::vector<int32_t>& data) const {
         std::vector<uint8_t> compressed;
 
         int32_t currentValue = 0;
@@ -231,7 +231,7 @@ namespace nanocbf {
         return compressed;
     }
 
-    std::vector<int32_t> CbfFrame::decompressData(const std::vector<uint8_t>& compressed, int width, int height) const {
+    std::vector<int32_t> CBFFrame::decompressData(const std::vector<uint8_t>& compressed, int width, int height) const {
         std::vector<int32_t> data;
         data.reserve(width * height);
 
@@ -270,30 +270,30 @@ namespace nanocbf {
         return data;
     }
 
-    void CbfFrame::writeInt16LE(std::vector<uint8_t>& buffer, int16_t value) const {
+    void CBFFrame::writeInt16LE(std::vector<uint8_t>& buffer, int16_t value) const {
         buffer.push_back(static_cast<uint8_t>(value & 0xFF));
         buffer.push_back(static_cast<uint8_t>((value >> 8) & 0xFF));
     }
 
-    void CbfFrame::writeInt32LE(std::vector<uint8_t>& buffer, int32_t value) const {
+    void CBFFrame::writeInt32LE(std::vector<uint8_t>& buffer, int32_t value) const {
         buffer.push_back(static_cast<uint8_t>(value & 0xFF));
         buffer.push_back(static_cast<uint8_t>((value >> 8) & 0xFF));
         buffer.push_back(static_cast<uint8_t>((value >> 16) & 0xFF));
         buffer.push_back(static_cast<uint8_t>((value >> 24) & 0xFF));
     }
 
-    uint16_t CbfFrame::readInt16LE(const uint8_t* buffer) const {
+    uint16_t CBFFrame::readInt16LE(const uint8_t* buffer) const {
         return static_cast<uint16_t>(buffer[0]) | (static_cast<uint16_t>(buffer[1]) << 8);
     }
 
-    uint32_t CbfFrame::readInt32LE(const uint8_t* buffer) const {
+    uint32_t CBFFrame::readInt32LE(const uint8_t* buffer) const {
         return static_cast<uint32_t>(buffer[0]) |
                (static_cast<uint32_t>(buffer[1]) << 8) |
                (static_cast<uint32_t>(buffer[2]) << 16) |
                (static_cast<uint32_t>(buffer[3]) << 24);
     }
 
-    std::string CbfFrame::generateArrayDataSection(const std::vector<uint8_t>& compressedData) const {
+    std::string CBFFrame::generateArrayDataSection(const std::vector<uint8_t>& compressedData) const {
         std::string md5Hash = generateMD5(compressedData);
 
         std::ostringstream oss;
@@ -316,7 +316,7 @@ namespace nanocbf {
         return oss.str();
     }
 
-    std::string CbfFrame::generateCbfPrefix(const std::string& filename) const {
+    std::string CBFFrame::generateCbfPrefix(const std::string& filename) const {
         std::string baseName = extractBaseName(filename);
 
         std::ostringstream oss;
@@ -326,7 +326,7 @@ namespace nanocbf {
         return oss.str();
     }
 
-    std::string CbfFrame::generateDefaultHeader() const {
+    std::string CBFFrame::generateDefaultHeader() const {
         std::ostringstream oss;
         oss << "_array_data.header_convention \"nanocbf empty\"\r\n"
             << "_array_data.header_contents\r\n"
@@ -336,7 +336,7 @@ namespace nanocbf {
         return oss.str();
     }
 
-    std::string CbfFrame::extractBaseName(const std::string& filepath) const {
+    std::string CBFFrame::extractBaseName(const std::string& filepath) const {
         // Find last slash or backslash for directory separation
         size_t lastSlash = filepath.find_last_of("/\\");
         std::string filename = (lastSlash == std::string::npos) ? filepath : filepath.substr(lastSlash + 1);
@@ -358,7 +358,7 @@ namespace nanocbf {
     }
 
     // Complete MD5 implementation
-    std::string CbfFrame::generateMD5(const std::vector<uint8_t>& data) const {
+    std::string CBFFrame::generateMD5(const std::vector<uint8_t>& data) const {
         // MD5 initialization
         uint32_t state[4] = {0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476};
         uint64_t count = 0;
@@ -375,7 +375,7 @@ namespace nanocbf {
         return bytesToBase64(digest, 16);
     }
 
-    std::string CbfFrame::bytesToHex(const uint8_t* bytes, size_t length) {
+    std::string CBFFrame::bytesToHex(const uint8_t* bytes, size_t length) {
         std::ostringstream oss;
         for (size_t i = 0; i < length; ++i) {
             oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(bytes[i]);
@@ -383,7 +383,7 @@ namespace nanocbf {
         return oss.str();
     }
 
-    std::string CbfFrame::bytesToBase64(const uint8_t* bytes, size_t length) {
+    std::string CBFFrame::bytesToBase64(const uint8_t* bytes, size_t length) {
         const char* b64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         std::string result;
 
@@ -410,7 +410,7 @@ namespace nanocbf {
     // Rotate left
     #define ROTLEFT(a, b) ((a << b) | (a >> (32 - b)))
 
-    void CbfFrame::md5Transform(uint32_t state[4], const uint8_t block[64]) {
+    void CBFFrame::md5Transform(uint32_t state[4], const uint8_t block[64]) {
         uint32_t a = state[0], b = state[1], c = state[2], d = state[3];
         uint32_t x[16];
 
@@ -469,7 +469,7 @@ namespace nanocbf {
         state[3] += d;
     }
 
-    void CbfFrame::md5Update(uint32_t state[4], uint64_t& count, uint8_t buffer[64], const uint8_t* input, size_t length) {
+    void CBFFrame::md5Update(uint32_t state[4], uint64_t& count, uint8_t buffer[64], const uint8_t* input, size_t length) {
         size_t bufferIndex = count % 64;
         count += length;
 
@@ -489,7 +489,7 @@ namespace nanocbf {
         }
     }
 
-    void CbfFrame::md5Final(uint8_t digest[16], uint32_t state[4], uint64_t count, uint8_t buffer[64]) {
+    void CBFFrame::md5Final(uint8_t digest[16], uint32_t state[4], uint64_t count, uint8_t buffer[64]) {
         size_t bufferIndex = count % 64;
         buffer[bufferIndex++] = 0x80;
 

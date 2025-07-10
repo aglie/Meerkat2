@@ -11,7 +11,7 @@ CBFImageLoader::CBFImageLoader(ReconstructionParameters par) :
         AbstractImageLoader(par)
 {
     //get file size
-    nanocbf::CbfFrame first_frame(current_frame_filename());
+    nanocbf::CBFFrame first_frame(current_frame_filename());
     current_frame_number-=frame_increment;
 
     //allocate memory
@@ -25,7 +25,7 @@ void CBFImageLoader::load_frame_to_buffer() {
     next_frame_f = async(launch::async, //async|deferred
                          [=](int current_frame_number)
                          {
-                             nanocbf::CbfFrame frame;
+                             nanocbf::CBFFrame frame;
                              if (frame.read(format_template(filename_template, current_frame_number + frame_increment))) {
                                  assert(frame.width == ny() and frame.height == nx());
                                  buffer = frame.data;
@@ -35,7 +35,7 @@ void CBFImageLoader::load_frame_to_buffer() {
 }
 
 bool CBFImageLoader::load_next_frame() {
-    current_frame_number+=frame_increment;
+    current_frame_number += frame_increment;
     if (current_frame_number > last_frame_number)
         return false;
 
