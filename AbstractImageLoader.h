@@ -11,7 +11,7 @@
 
 class AbstractImageLoader {
 public:
-    explicit AbstractImageLoader(ReconstructionParameters par);
+    explicit AbstractImageLoader(const ReconstructionParameters & par);
     virtual ~AbstractImageLoader() = default;
 
     virtual bool load_next_frame() = 0;

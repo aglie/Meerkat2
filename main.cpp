@@ -27,7 +27,6 @@ class ImageDataIterator {
 
 // For the sake of possibility of future speed optimizations this function is written as close to C as possible
 void reconstruct_data(ReconstructionParameters& par) {
-
     ExperimentalParameters & exp = par.exp;
 
     auto measured_frames = createImageLoader(par);
@@ -64,7 +63,7 @@ void reconstruct_data(ReconstructionParameters& par) {
 
         t1 = chrono::system_clock::now();
 
-        if(par.microsteps[2] == 1) //  should be kicking away frame microstepping and removing one indirection in the orientation matrix. DOesn't seem to add anything to the speed.
+        if(par.microsteps[2] == 1) //  should be kicking away frame microstepping and removing one indirection in the orientation matrix. Doesn't seem to add anything to the speed.
         {
             auto lab2hkl_mat = pixel_to_hkl_matrix(exp, measured_frames->current_frame_no());
             for(size_t ind=0; ind<Nx*Ny; ind+=1)
@@ -332,7 +331,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    cout << "Meerkat2 v. 0.35" << endl;
+    cout << "meerkat2 v. 0.36" << endl;
 
 //this might help with error messages when mmap memory allocation fails
 //#if (defined(__MACH__) && defined(__APPLE__))

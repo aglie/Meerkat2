@@ -6,7 +6,12 @@
 
 #include "Hdf5HelperFuncitons.h"
 
-AbstractImageLoader::AbstractImageLoader(ReconstructionParameters par) {
+AbstractImageLoader::AbstractImageLoader(const ReconstructionParameters & par) {
+    filename_template = par.data_filename_template;
+    frame_increment = par.frame_increment;
+    last_frame_number = par.last_image;
+    current_frame_number = par.first_image;
+
     if(par.mask_filename != "") {
         // load mask
         if(!file_exists(par.mask_filename)) {

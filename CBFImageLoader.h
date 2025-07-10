@@ -7,8 +7,7 @@
 
 #include <future>
 #include "AbstractImageLoader.h"
-#include "CBFDataReader.h"
-
+//#include "CBFDataReader.h"
 
 class CBFImageLoader : public AbstractImageLoader {
 public:
