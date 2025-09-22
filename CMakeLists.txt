@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.31)
 project(Meerkat2)
 
 include(cmake/hdf5.cmake)
@@ -55,14 +55,14 @@ set_target_properties(meerkat2-lib PROPERTIES
         CXX_EXTENSIONS OFF
 )
 
-add_executable(meerkat2 main.cpp)
-set_target_properties(meerkat2 PROPERTIES
+add_executable(Meerkat2 main.cpp)
+set_target_properties(Meerkat2 PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF
 )
 add_dependencies(meerkat2-lib eigen)
-target_link_libraries(meerkat2 meerkat2-lib) #libcbf.a ${HDF5_LIBRARIES}
+target_link_libraries(Meerkat2 meerkat2-lib) #libcbf.a ${HDF5_LIBRARIES}
 
 DownloadHDF5For(meerkat2-lib)
 #DownloadCBFFor(meerkat2-lib)

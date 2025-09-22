@@ -23,7 +23,6 @@
  */
 
 //TODO: width, height, headers -> interface?? just to be able to work with an interface later???
-//TODO: do I need overload over some datatypes?
 //TODO: might be useful to just read headers without reding the data itself, thought not soooo important
 
 
