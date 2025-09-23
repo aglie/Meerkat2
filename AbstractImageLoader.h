@@ -43,6 +43,8 @@ public:
     int nx() const { return m_dim2; }
     int current_frame_no() const { return current_frame_number; }
 
+    void load_mask(string mask_filename);
+
 protected:
     virtual void load_frame_to_buffer() = 0;
 

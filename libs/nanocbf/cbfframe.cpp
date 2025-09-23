@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "CBFFrame.h"
+#include "cbfframe.h"
 #include <fstream>
 #include <sstream>
 #include <regex>

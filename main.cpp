@@ -30,6 +30,9 @@ void reconstruct_data(ReconstructionParameters& par) {
     ExperimentalParameters & exp = par.exp;
 
     auto measured_frames = createImageLoader(par);
+    measured_frames->load_mask(par.mask_filename);
+
+
     OutputData out(par);
 
     const size_t Nx = measured_frames->nx();
@@ -331,7 +334,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    cout << "meerkat2 v. 0.36" << endl;
+    cout << "meerkat2 v. 0.37" << endl;
 
 //this might help with error messages when mmap memory allocation fails
 //#if (defined(__MACH__) && defined(__APPLE__))

@@ -49,6 +49,9 @@ set(SOURCE_FILES
         libs/nanocbf/cbfframe.cpp)
 
 add_library(meerkat2-lib ${SOURCE_FILES})
+DownloadHDF5For(meerkat2-lib)
+
+
 set_target_properties(meerkat2-lib PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
@@ -64,12 +67,8 @@ set_target_properties(Meerkat2 PROPERTIES
 add_dependencies(meerkat2-lib eigen)
 target_link_libraries(Meerkat2 meerkat2-lib) #libcbf.a ${HDF5_LIBRARIES}
 
-DownloadHDF5For(meerkat2-lib)
-#DownloadCBFFor(meerkat2-lib)
-
 #add_executable(TestYellFormat TestYellFormat.cpp)
 #target_link_libraries(TestYellFormat meerkat2-lib ${HDF5_LIBRARIES})
-
 
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/lib/cxxtest/build_tools/cmake")
 #find_package(CxxTest)
