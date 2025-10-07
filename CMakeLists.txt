@@ -1,6 +1,17 @@
 cmake_minimum_required(VERSION 3.31)
 project(Meerkat2)
 
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+    set(TARGET_ARCH "arm64" CACHE STRING "Target architecture for macOS (e.g., arm64, x86_64).")
+    set(CMAKE_OSX_ARCHITECTURES "${TARGET_ARCH}" CACHE STRING "OSX Architectures" FORCE)
+
+    # Argument that will be passed to hdf5 and bitshuffle
+    set(ARCH_CMAKE_ARG "-DCMAKE_OSX_ARCHITECTURES=${TARGET_ARCH}")
+else()
+    set(ARCH_CMAKE_ARG "")
+endif()
+
+
 include(cmake/hdf5.cmake)
 include(cmake/CBFlib.cmake)
 
