@@ -138,7 +138,6 @@ const MaterialAttenuationParameters helium_attenuation_params = {
 
 float transmission(string material, float wavelength, float path_length) {
     //TODO: add new mediums as needed. In the last years we have never measured in helium
-
     MaterialAttenuationParameters mat;
     if(material == "Air") {
         mat=air_attenuation_params;
@@ -230,7 +229,7 @@ float calculate_correction_coefficient(ExperimentalParameters & experiment, int 
 
     auto res = solid_angle_correction * polarization_correction * air_transmission;
 
-    if (experiment.detector=="Pilatus") {
+    if (experiment.detector=="Pilatus_Si") {
         auto ray_len_in_detector = experiment.detector_thickness/cos_detected_ray_angle;
 
         auto pilatus_photon_efficiency = 1 - transmission("Silicon", experiment.wavelength, ray_len_in_detector);

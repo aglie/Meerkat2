@@ -334,7 +334,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    cout << "meerkat2 v. 0.37" << endl;
+    cout << "meerkat2 v. 0.38" << endl;
 
 //this might help with error messages when mmap memory allocation fails
 //#if (defined(__MACH__) && defined(__APPLE__))

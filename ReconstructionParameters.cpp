@@ -152,7 +152,6 @@ void load_xparm(string filename, ExperimentalParameters & r) {
     //     cout <<
     //     "Warning: unknown version of XPARM.XDS file. This version has not been tested yet, use Meerkat at your own risk.\n";
 
-
     //TODO: XPARM.XDS is inconsistent with GXPARM.XDS
     //TODO: XPARM has the xcenter ycenter off by +1 pixel, subtract
     //TODO: properly test it, has it improved?
@@ -255,6 +254,8 @@ ReconstructionParameters load_refinement_parameters(string filename) {
             in >> par.exp.detector;
         else if (keyword == "DETECTOR_THICKNESS")
             in >> par.exp.detector_thickness;
+        else if ( keyword == "DETECTOR")
+            in >> par.exp.detector;
         else if (keyword == "MICROSTEP_FRAMES")
             in >> par.microsteps[2];
         else if (keyword == "RECONSTRUCT_EVERY_NTH_FRAME")
