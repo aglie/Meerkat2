@@ -2,9 +2,9 @@ name: CMake on Windows and Linux
 
 on:
   push:
-    branches: [ "move-to-nanocbf" ]
+    branches: [ "moving-to-nanocbf" ]
   pull_request:
-    branches: [ "move-to-nanocbf" ]
+    branches: [ "moving-to-nanocbf" ]
 
 jobs:
   build:
