@@ -117,6 +117,7 @@ string throw_parser_error(const string& filename, istream& in,const string& desc
     err_text << endl << endl << ctx.context << endl << endl;
 
     throw ParserError(err_text.str());
+
 }
 
 string throw_undefined_keyword(const string& filename, string keyword) {
