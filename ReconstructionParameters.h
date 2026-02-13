@@ -106,8 +106,6 @@ bool operator== (const ContextAroundPosition& a, const ContextAroundPosition& b)
 
 ContextAroundPosition get_context(istream& in);
 
-ReconstructionParameters load_experimental_parameters(string filename);
-
 void load_xparm(string filename, ExperimentalParameters & r);
 
 ReconstructionParameters load_refinement_parameters(string filename);

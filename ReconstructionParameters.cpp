@@ -7,13 +7,6 @@
 #include <sstream>
 #include "ReconstructionParameters.h"
 
-ReconstructionParameters load_experimental_parameters(string filename) {
-    //should load the data from XPARM.XDS or GXPARM.XDS
-    //also check the invisible areas on XDS, and load those
-    //Also check ascii hkl and load those, figuring out the limits
-    //Or maybe figure out the limits from the measured dataset limits??
-}
-
 
 template<class T>
 bool isIn(const T& target, const std::set<T>& the_set)
