@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 3.24)
 project(Meerkat2)
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
