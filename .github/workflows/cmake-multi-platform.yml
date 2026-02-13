@@ -111,16 +111,16 @@ jobs:
       with:
         path: artifacts
 
-    - name: Prepare release files
+    - name: Rename artifacts
       shell: bash
       run: |
-        cd artifacts
-        for dir in Meerkat2-*/; do
-          platform="${dir%/}"
+        mkdir -p release
+        for dir in artifacts/Meerkat2-*/; do
+          name="$(basename "$dir")"
           if ls "$dir"/*.exe 1>/dev/null 2>&1; then
-            cp "$dir"/Meerkat2.exe "${platform}.exe"
+            cp "$dir"/Meerkat2.exe "release/${name}.exe"
           else
-            cp "$dir"/Meerkat2 "${platform}"
+            cp "$dir"/Meerkat2 "release/${name}"
           fi
         done
 
@@ -129,4 +129,4 @@ jobs:
       with:
         draft: true
         generate_release_notes: true
-        files: artifacts/Meerkat2-*[!/]
+        files: release/*
