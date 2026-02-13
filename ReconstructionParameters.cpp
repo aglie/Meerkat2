@@ -45,7 +45,7 @@ ContextAroundPosition get_context(istream& in) {
         getline(in,line);
         lines.push_back(line);
     } else
-        while(int(in.tellg()) < context_position and !in.eof()) {
+        while(int(in.tellg()) < context_position && !in.eof()) {
             getline(in,line);
             lines.push_back(line);
         }
@@ -211,7 +211,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         if(reached_eof(in))
             break;
 
-        if (keyword[0] == '!' or keyword[0] == '#') {
+        if (keyword[0] == '!' || keyword[0] == '#') {
             getline(in, keyword);
             continue;
         }
@@ -272,7 +272,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         }
     }
 
-    if(par.lower_limits[0]==NAN and par.lower_limits[1]==NAN and par.lower_limits[2]==NAN)
+    if(par.lower_limits[0]==NAN && par.lower_limits[1]==NAN && par.lower_limits[2]==NAN)
         throw_undefined_keyword(filename,"LOWER_LIMITS");
 
     //Most of the people will use the lower and upper limits plus the number of steps. Stepsize is something esoteric.
@@ -285,7 +285,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         for (int i = 0; i < 3; ++i)
             par.step_sizes[i] = (upper_limits[i]-par.lower_limits[i]) / (par.number_of_pixels[i]-1);
 
-    if(par.step_sizes[0]==NAN and par.step_sizes[1]==NAN and par.step_sizes[2]==NAN)
+    if(par.step_sizes[0]==NAN && par.step_sizes[1]==NAN && par.step_sizes[2]==NAN)
         throw_undefined_keyword(filename,"STEP_SIZES or UPPER_LIMITS or SYMMETRIC_LIMITS");
 
     if(par.data_filename_template=="")
@@ -308,7 +308,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
     if(par.last_image==numeric_limits<size_t>::max()) {
         int i;
         for(i=par.first_image; i<10000; i+=par.frame_increment) {
-            if(not file_exists(format_template(par.data_filename_template, i))) {
+            if(!file_exists(format_template(par.data_filename_template, i))) {
                 i-=par.frame_increment;
                 break;
             }

@@ -95,8 +95,8 @@ void reconstruct_data(ReconstructionParameters& par) {
             const size_t tile_size=4;
             for(size_t xt=0; xt<Nx; xt+=tile_size)
                 for(size_t yt=0; yt<Ny; yt+=tile_size)
-                    for(size_t x=xt; x<xt+tile_size and x<Nx; ++x )
-                        for(size_t y=yt; y<yt+tile_size and y<Ny; ++y)
+                    for(size_t x=xt; x<xt+tile_size && x<Nx; ++x )
+                        for(size_t y=yt; y<yt+tile_size && y<Ny; ++y)
                             if(measured_frames->should_reconstruct(x, y)) {
                                 corrected_frame_dt I = measured_frames->current_frame(x, y) * inv_corrections[x*Ny+y];
                                 for(size_t microstep=0; microstep < ms_f.number; microstep += 1)
@@ -322,14 +322,14 @@ void check_all_frames_exist(const ReconstructionParameters& par) {
     //TODO: move this check to abstract loader, since it is hard to figure out from hdf5 whether it is all good
     for(int i=par.first_image; i<=par.last_image; i+=par.frame_increment) {
         string filename = format_template(par.data_filename_template, i);
-        if(not file_exists(filename))
+        if(!file_exists(filename))
             throw FileNotFound(filename);
     }
 }
 
 
 int main(int argc, char* argv[]) {
-    if(argc < 2 or argc > 2) {
+    if(argc < 2 || argc > 2) {
         cout << "usage: meerkat2 filename.mrk" << endl;
         return 0;
     }

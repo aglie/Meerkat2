@@ -27,7 +27,7 @@ void CBFImageLoader::load_frame_to_buffer() {
                          {
                              nanocbf::CBFFrame frame;
                              if (frame.read(format_template(filename_template, current_frame_number + frame_increment))) {
-                                 assert(frame.width == ny() and frame.height == nx());
+                                 assert(frame.width == ny() && frame.height == nx());
                                  buffer = frame.data;
                              }
 

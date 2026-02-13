@@ -130,9 +130,9 @@ inline void get_index(
 }
 
 inline bool indices_within_bounds(ReconstructionParameters& p, int* i) {
-    return i[0]>=0 and i[1]>=0 and i[2]>=0 and \
-           i[0]<p.number_of_pixels[0] and \
-           i[1]<p.number_of_pixels[1] and \
+    return i[0]>=0 && i[1]>=0 && i[2]>=0 &&
+           i[0]<p.number_of_pixels[0] &&
+           i[1]<p.number_of_pixels[1] &&
            i[2]<p.number_of_pixels[2];
 }
 
