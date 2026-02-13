@@ -31,7 +31,7 @@ struct ExperimentalParameters {
     float detector_thickness;
 
     ExperimentalParameters() :
-            polarization_plane_normal{0, 1, 0},
+            polarization_plane_normal(0, 1, 0),
             polarization_factor(0.5)
     {}
 };
@@ -39,12 +39,14 @@ struct ExperimentalParameters {
 struct ReconstructionParameters {
     string mask_filename;
     string data_filename_template;
+    string hdf5_dataset_name;
     string xparm_filename;
     size_t first_image;
     size_t last_image;
     size_t number_of_pixels[3];
     reciprocal_fractional_t lower_limits[3];
     reciprocal_fractional_t step_sizes[3];
+    reciprocal_fractional_t inv_step_sizes[3];
     bool reconstruct_in_orthonormal_basis;
     //measured_pixels in some format - missing in the baseline
     size_t microsteps[3];
@@ -57,6 +59,7 @@ struct ReconstructionParameters {
     ReconstructionParameters() :
             data_filename_template(""),
             xparm_filename(""),
+            hdf5_dataset_name(""),
             output_filename(""),
             mask_filename(""),
             first_image(1),
@@ -102,8 +105,6 @@ struct ContextAroundPosition {
 bool operator== (const ContextAroundPosition& a, const ContextAroundPosition& b);
 
 ContextAroundPosition get_context(istream& in);
-
-ReconstructionParameters load_experimental_parameters(string filename);
 
 void load_xparm(string filename, ExperimentalParameters & r);
 

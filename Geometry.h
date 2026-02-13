@@ -19,15 +19,16 @@ inline void rotvec2mat(vec3& u, float phi, matrix_3x3& res) {
     auto uy = u[1];
     auto uz = u[2];
 
-    res[0][0] = t * ux * ux + c;
-    res[0][1] = t * ux * uy - s * uz;
-    res[0][2] = t * ux * uz + s * uy;
-    res[1][0] = t * ux * uy + s * uz;
-    res[1][1] = t * uy * uy + c;
-    res[1][2] = t * uy * uz - s * ux;
-    res[2][0] = t * ux * uz - s * uy;
-    res[2][1] = t * uy * uz + s * ux;
-    res[2][2] = t * uz * uz + c;
+    res(0, 0) = t * ux * ux + c;
+    res(0, 1) = t * ux * uy - s * uz;
+    res(0, 2) = t * ux * uz + s * uy;
+    res(1, 0) = t * ux * uy + s * uz;
+    res(1, 1) = t * uy * uy + c;
+    res(1, 2) = t * uy * uz - s * ux;
+    res(2, 0) = t * ux * uz - s * uy;
+    res(2, 1) = t * uy * uz + s * ux;
+    res(2, 2) = t * uz * uz + c;
+
 }
 
 
@@ -76,6 +77,17 @@ inline vec3 rotate_to_frame(
     return hkl;
 }
 
+template<typename T>
+inline matrix_3x3 pixel_to_hkl_matrix(
+        ExperimentalParameters & p,
+        const T& frame_no)
+{
+    auto phi = (frame_no - p.starting_frame) * p.oscillation_angle + p.starting_angle;
+    matrix_3x3 rotation_matrix;
+    rotvec2mat(p.oscillation_axis, -2 * PI_F * phi / 360, rotation_matrix);
+    return p.cell_vectors* rotation_matrix;
+}
+
 template<typename T1, typename T2>
 inline vec3 det2lab(ExperimentalParameters & p,
                     const T1& x,
@@ -95,11 +107,15 @@ inline vec3 det2hkl(ExperimentalParameters & p,
 }
 
 
-inline void to_index(ReconstructionParameters& par,
-        vec3 hkl, int* indices) {
-    indices[0] = round( (hkl[0]-par.lower_limits[0])/par.step_sizes[0]);
-    indices[1] = round( (hkl[1]-par.lower_limits[1])/par.step_sizes[1]);
-    indices[2] = round( (hkl[2]-par.lower_limits[2])/par.step_sizes[2]);
+inline void to_index(const ReconstructionParameters& par,
+        const vec3 hkl, int* res ) {
+
+    // round operation is implicit in conversion which applies floor, together with floor it makes it correctly
+    // TODO: SOMTHING CHAGED, test it thoroughly
+    // Check part with microstepping thoroughly!
+    res[0] = int((hkl[0] - par.lower_limits[0]) * par.inv_step_sizes[0] + 0.5);
+    res[1] = int((hkl[1] - par.lower_limits[1]) * par.inv_step_sizes[1] + 0.5);
+    res[2] = int((hkl[2] - par.lower_limits[2]) * par.inv_step_sizes[2] + 0.5);
 }
 
 inline void get_index(
@@ -114,9 +130,9 @@ inline void get_index(
 }
 
 inline bool indices_within_bounds(ReconstructionParameters& p, int* i) {
-    return i[0]>=0 and i[1]>=0 and i[2]>=0 and \
-           i[0]<p.number_of_pixels[0] and \
-           i[1]<p.number_of_pixels[1] and \
+    return i[0]>=0 && i[1]>=0 && i[2]>=0 &&
+           i[0]<p.number_of_pixels[0] &&
+           i[1]<p.number_of_pixels[1] &&
            i[2]<p.number_of_pixels[2];
 }
 

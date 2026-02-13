@@ -15,7 +15,6 @@ public:
             size{par.number_of_pixels[0],par.number_of_pixels[1],par.number_of_pixels[2]},
             rebinned_data(par.number_of_pixels[0]*par.number_of_pixels[1]*par.number_of_pixels[2]),
             no_pixels_rebinned(par.number_of_pixels[0]*par.number_of_pixels[1]*par.number_of_pixels[2])
-
     {
     }
     out_float_number& rebinned_data_at(int hi, int ki, int li) {return rebinned_data[hkli2i(hi,ki,li)];}
@@ -27,7 +26,7 @@ private:
     vector<out_float_number> rebinned_data;
     vector<size_t> no_pixels_rebinned;
     size_t size[3];
-    int hkli2i(int hi, int ki, int li) {return (hi*size[1]+ki)*size[2]+li;}
+    inline int hkli2i(int hi, int ki, int li) {return (hi*size[1]+ki)*size[2]+li;}
 
     // In the simplest implementation is simply a NxMxL dataset
     // Should allow to hold running sum of rebinned data and the number of pixels rebinned

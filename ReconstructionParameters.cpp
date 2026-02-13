@@ -7,13 +7,6 @@
 #include <sstream>
 #include "ReconstructionParameters.h"
 
-ReconstructionParameters load_experimental_parameters(string filename) {
-    //should load the data from XPARM.XDS or GXPARM.XDS
-    //also check the invisible areas on XDS, and load those
-    //Also check ascii hkl and load those, figuring out the limits
-    //Or maybe figure out the limits from the measured dataset limits??
-}
-
 
 template<class T>
 bool isIn(const T& target, const std::set<T>& the_set)
@@ -45,7 +38,7 @@ ContextAroundPosition get_context(istream& in) {
         getline(in,line);
         lines.push_back(line);
     } else
-        while(int(in.tellg()) < context_position and !in.eof()) {
+        while(int(in.tellg()) < context_position && !in.eof()) {
             getline(in,line);
             lines.push_back(line);
         }
@@ -117,6 +110,7 @@ string throw_parser_error(const string& filename, istream& in,const string& desc
     err_text << endl << endl << ctx.context << endl << endl;
 
     throw ParserError(err_text.str());
+
 }
 
 string throw_undefined_keyword(const string& filename, string keyword) {
@@ -148,10 +142,9 @@ void load_xparm(string filename, ExperimentalParameters & r) {
         throw FileNotFound(filename);
 
     getline(in, r.format);
-    if (!isIn(r.format, known_xds_formats))
-        cout <<
-        "Warning: unknown version of XPARM.XDS file. This version has not been tested yet, use Meerkat at your own risk.\n";
-
+    // if (!isIn(r.format, known_xds_formats))
+    //     cout <<
+    //     "Warning: unknown version of XPARM.XDS file. This version has not been tested yet, use Meerkat at your own risk.\n";
 
     //TODO: XPARM.XDS is inconsistent with GXPARM.XDS
     //TODO: XPARM has the xcenter ycenter off by +1 pixel, subtract
@@ -162,9 +155,9 @@ void load_xparm(string filename, ExperimentalParameters & r) {
     r.oscillation_axis[0] >> r.oscillation_axis[1] >> r.oscillation_axis[2] >>
     r.wavelength >> r.wavevector[0] >> r.wavevector[1] >> r.wavevector[2] >>
     r.space_group_nr >> r.cell[0] >> r.cell[1] >> r.cell[2] >> r.cell[3] >> r.cell[4] >> r.cell[5] >>
-    r.cell_vectors[0][0] >> r.cell_vectors[0][1] >> r.cell_vectors[0][2] >>
-    r.cell_vectors[1][0] >> r.cell_vectors[1][1] >> r.cell_vectors[1][2] >>
-    r.cell_vectors[2][0] >> r.cell_vectors[2][1] >> r.cell_vectors[2][2] >>
+    r.cell_vectors(0, 0) >> r.cell_vectors(0, 1) >> r.cell_vectors(0, 2) >>
+    r.cell_vectors(1, 0) >> r.cell_vectors(1, 1) >> r.cell_vectors(1, 2) >>
+    r.cell_vectors(2, 0) >> r.cell_vectors(2, 1) >> r.cell_vectors(2, 2) >>
     // We are changing x and y directions because xds uses fortran array notations, while we use C
     r.number_of_detector_segments >> r.NY >> r.NX >> r.pixel_size_y >> r.pixel_size_x >>
     r.y_center >> r.x_center >> r.distance_to_detector >>
@@ -204,17 +197,18 @@ ReconstructionParameters load_refinement_parameters(string filename) {
     reciprocal_fractional_t upper_limits[3];
     bool upper_limits_defined = false;
 
-    string keyword;
+    std::string keyword;
 
     while (!in.eof()) {
         in >> keyword;
         if(reached_eof(in))
             break;
 
-        if (keyword[0] == '!' or keyword[0] == '#') {
+        if (keyword[0] == '!' || keyword[0] == '#') {
             getline(in, keyword);
             continue;
         }
+
 
         if (keyword == "DATA_FILE_TEMPLATE")
             in >> par.data_filename_template;
@@ -231,6 +225,8 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         else if (keyword == "UPPER_LIMITS") {
             in >> upper_limits[0] >> upper_limits[1] >> upper_limits[2];
             upper_limits_defined=true;
+        } else if(keyword == "HDF5_DATASET_NAME") {
+            in >> par.hdf5_dataset_name;
         }
         else if (keyword == "STEP_SIZES")
             in >> par.step_sizes[0] >> par.step_sizes[1] >> par.step_sizes[2];
@@ -252,6 +248,8 @@ ReconstructionParameters load_refinement_parameters(string filename) {
             in >> par.exp.detector;
         else if (keyword == "DETECTOR_THICKNESS")
             in >> par.exp.detector_thickness;
+        else if ( keyword == "DETECTOR")
+            in >> par.exp.detector;
         else if (keyword == "MICROSTEP_FRAMES")
             in >> par.microsteps[2];
         else if (keyword == "RECONSTRUCT_EVERY_NTH_FRAME")
@@ -267,7 +265,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         }
     }
 
-    if(par.lower_limits[0]==NAN and par.lower_limits[1]==NAN and par.lower_limits[2]==NAN)
+    if(par.lower_limits[0]==NAN && par.lower_limits[1]==NAN && par.lower_limits[2]==NAN)
         throw_undefined_keyword(filename,"LOWER_LIMITS");
 
     //Most of the people will use the lower and upper limits plus the number of steps. Stepsize is something esoteric.
@@ -280,7 +278,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
         for (int i = 0; i < 3; ++i)
             par.step_sizes[i] = (upper_limits[i]-par.lower_limits[i]) / (par.number_of_pixels[i]-1);
 
-    if(par.step_sizes[0]==NAN and par.step_sizes[1]==NAN and par.step_sizes[2]==NAN)
+    if(par.step_sizes[0]==NAN && par.step_sizes[1]==NAN && par.step_sizes[2]==NAN)
         throw_undefined_keyword(filename,"STEP_SIZES or UPPER_LIMITS or SYMMETRIC_LIMITS");
 
     if(par.data_filename_template=="")
@@ -303,7 +301,7 @@ ReconstructionParameters load_refinement_parameters(string filename) {
     if(par.last_image==numeric_limits<size_t>::max()) {
         int i;
         for(i=par.first_image; i<10000; i+=par.frame_increment) {
-            if(not file_exists(format_template(par.data_filename_template, i))) {
+            if(!file_exists(format_template(par.data_filename_template, i))) {
                 i-=par.frame_increment;
                 break;
             }

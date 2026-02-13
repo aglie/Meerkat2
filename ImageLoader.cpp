@@ -9,19 +9,18 @@
 #include <future>
 #include <iostream>
 #include "ImageLoader.h"
-#include "cbf.h"
+//#include "cbf.h"
 #include "CBFDataReader.h"
 #include "Hdf5HelperFuncitons.h"
 
 ImageLoader::ImageLoader(ReconstructionParameters par) :
     current_frame_number(par.first_image),
-    filename_template (par.data_filename_template),
-    last_frame_number (par.last_image),
+    filename_template(par.data_filename_template),
+    last_frame_number(par.last_image),
     frame_increment(par.frame_increment),
     mask_is_defined(false)
 {
     //get file size
-
     CBFDataReader first_frame(current_frame_filename());
     current_frame_number-=frame_increment;
 
@@ -31,8 +30,6 @@ ImageLoader::ImageLoader(ReconstructionParameters par) :
 
     data = (int *)malloc(sizeof(int)*m_dim1*m_dim2);
     buffer = (int *)malloc(sizeof(int)*m_dim1*m_dim2); //Tick-tock buffer.
-    // One way to increase speed would be to read and reconstruct several images at a time
-    // possibly it will be cool to shuffle bytes by staggering them together along z??? or actually it should not.
 
     if(par.mask_filename != "") {
         // load mask
@@ -44,7 +41,7 @@ ImageLoader::ImageLoader(ReconstructionParameters par) :
         auto sz = getDatasetDimensions(file, "data");
         if(sz[0]!=m_dim2 || sz[1]!=m_dim1) {
             std::stringstream message;
-            message << "Error with input mask dimensions. Expect " << m_dim1 << "x" << m_dim2 << " found " << sz[0] <<"x" << sz[1] << "." << endl;
+            message << "Error with input mask dimensions. Expected " << m_dim1 << "x" << m_dim2 << " found " << sz[0] <<"x" << sz[1] << "." << endl;
             throw MaskError(message.str());
         }
         mask = readVector<int>(file, "data");
@@ -71,6 +68,8 @@ void swap_a_for_b(T& a, T& b) {
     b=t;
 }
 
+
+// TODO: check this works with stepping over some frames
 bool ImageLoader::load_next_frame() {
     current_frame_number+=frame_increment;
     if (current_frame_number > last_frame_number)

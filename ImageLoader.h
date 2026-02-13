@@ -12,20 +12,27 @@
 
 
 class ImageLoader {
-
 public:
     ImageLoader(ReconstructionParameters par);
     bool load_next_frame();
     inline bool should_reconstruct(size_t x, size_t y) {
-        if(mask_is_defined)
-            return (current_frame(x,y) >= 0) && mask[xy2index(x,y)];
-        else
-            return current_frame(x,y) >= 0;
+        return should_reconstruct(xy2index(x,y));
     };
+
+    inline bool should_reconstruct(size_t ind) {
+        if(mask_is_defined)
+            return (current_frame(ind) >= 0) && mask[ind];
+        else
+            return current_frame(ind) >= 0;
+    }
 
     inline corrected_frame_dt current_frame(size_t x, size_t y) {
         return data[xy2index(x, y)];
     };
+
+    inline corrected_frame_dt current_frame(size_t ind) {
+        return data[ind];
+    }
 
     ~ImageLoader() {
         free(data);

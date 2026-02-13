@@ -26,7 +26,7 @@ DataType getH5Type<size_t> () {
 }
 
 void writeVector(H5File& file, string datasetName, vec3 v) {
-    writeVector<float,3>(file, datasetName, v.data);
+    writeVector<float,3>(file, datasetName, v.data());
 }
 
 void writeYellFormatString(H5File& file) {
@@ -43,9 +43,9 @@ vector<size_t> getDatasetDimensions(H5File& f, const string& datasetName) {
     DataSpace dataspace = dataset.getSpace();
     int rank = dataspace.getSimpleExtentNdims();
 
-    hsize_t rawDimensions[rank];
+    vector<hsize_t> rawDimensions(rank);
 
-    dataspace.getSimpleExtentDims(rawDimensions);
+    dataspace.getSimpleExtentDims(rawDimensions.data());
 
     vector<size_t> res(rank, 0);
 
