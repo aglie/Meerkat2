@@ -34,7 +34,7 @@ jobs:
             cpp_compiler: clang++
             build_type: Release
             cmake_extra_args: '-DTARGET_ARCH=arm64'
-          - os: macos-13
+          - os: macos-latest
             c_compiler: clang
             cpp_compiler: clang++
             build_type: Release
