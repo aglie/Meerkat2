@@ -88,9 +88,9 @@ jobs:
       run: |
         mkdir -p staging
         if [ "${{ runner.os }}" = "Windows" ]; then
-          cp ${{ steps.strings.outputs.build-output-dir }}/Release/Meerkat2.exe staging/
+          cp build/Release/Meerkat2.exe staging/
         else
-          cp ${{ steps.strings.outputs.build-output-dir }}/Meerkat2 staging/
+          cp build/Meerkat2 staging/
         fi
 
     - name: Upload artifact
