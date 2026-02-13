@@ -3,6 +3,7 @@ name: CMake on Windows and Linux
 on:
   push:
     branches: [ "moving-to-nanocbf" ]
+    tags: [ "v*" ]
   pull_request:
     branches: [ "moving-to-nanocbf" ]
 
@@ -70,3 +71,51 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }}
+
+    - name: Stage binary
+      shell: bash
+      run: |
+        mkdir -p staging
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          cp ${{ steps.strings.outputs.build-output-dir }}/Release/Meerkat2.exe staging/
+        else
+          cp ${{ steps.strings.outputs.build-output-dir }}/Meerkat2 staging/
+        fi
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Meerkat2-${{ matrix.os }}-${{ matrix.c_compiler }}
+        path: staging/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Prepare release files
+      shell: bash
+      run: |
+        cd artifacts
+        for dir in Meerkat2-*/; do
+          platform="${dir%/}"
+          if ls "$dir"/*.exe 1>/dev/null 2>&1; then
+            cp "$dir"/Meerkat2.exe "${platform}.exe"
+          else
+            cp "$dir"/Meerkat2 "${platform}"
+          fi
+        done
+
+    - name: Create release
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+        generate_release_notes: true
+        files: artifacts/Meerkat2-*[!/]
