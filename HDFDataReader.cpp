@@ -45,6 +45,8 @@ HDFDataReader::HDFDataReader(string filename, string dataset_name) :
         /*
  * Similarly, check for availability of the shuffle filter.
  */
+        bshuf_register_h5filter();
+
         auto avail = H5Zfilter_avail(H5Z_FILTER_SHUFFLE);
         if (!avail) {
             std::cout << "Shuffle filter not available.\n";
@@ -76,7 +78,9 @@ HDFDataReader::HDFDataReader(string filename, string dataset_name) :
         int ndims = dataspace.getSimpleExtentDims( dims_in, NULL);
         assert(ndims == 3);
 
-        m_no_frames = dims_in[0], m_dim1 = dims_in[1], m_dim2 = dims_in[2];
+        // dims_in layout is [frames, slow, fast].
+        // Convention in this codebase (matching CBF): m_dim1 = fast (width) → ny(), m_dim2 = slow (height) → nx()
+        m_no_frames = dims_in[0]; m_dim1 = dims_in[2]; m_dim2 = dims_in[1];
 
     } catch (H5::FileIException& file_error) {
         std::cerr << "Error opening file: " << filename << std::endl;
@@ -110,16 +114,16 @@ void HDFDataReader::read_frame(int frame_no, int* out) {
     offset[1] = 0;
     offset[2] = 0;
     count[0]  = 1;
-    count[1]  = dim1();
-    count[2]  = dim2();
+    count[1]  = dim2();  // slow (height) — HDF5 dimension index 1
+    count[2]  = dim1();  // fast (width)  — HDF5 dimension index 2
     dataspace.selectHyperslab( H5S_SELECT_SET, count, offset );
 
 /*
  * Define the memory dataspace.
  */
     hsize_t     dimsm[2];              /* memory space dimensions */
-    dimsm[0] = dim1();
-    dimsm[1] = dim2();
+    dimsm[0] = dim2();  // slow (height)
+    dimsm[1] = dim1();  // fast (width)
     DataSpace memspace( 2, dimsm );
 
 /*
@@ -129,8 +133,8 @@ void HDFDataReader::read_frame(int frame_no, int* out) {
     hsize_t      count_out[2];    // size of the hyperslab in memory
     offset_out[0] = 0;
     offset_out[1] = 0;
-    count_out[0]  = dim1();
-    count_out[1]  = dim2();
+    count_out[0]  = dim2();  // slow (height)
+    count_out[1]  = dim1();  // fast (width)
     memspace.selectHyperslab( H5S_SELECT_SET, count_out, offset_out );
 
     /*
