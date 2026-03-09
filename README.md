@@ -12,7 +12,7 @@ Meerkat2 configuration_file.mrk
 
 Meerkat2 reads a single plain-text configuration file (conventionally `.mrk`). Lines starting with `#` or `!` are comments.
 
-### Example configuration file
+### Example configuration file (CBF)
 
 ```
 # reconstruct.mrk
@@ -30,11 +30,33 @@ OUTPUT_FILENAME reconstruction.h5
 MASK masks/mask.h5
 ```
 
+### Example configuration file (HDF5)
+
+For HDF5 input, provide the file path directly in `DATA_FILE_TEMPLATE` (no `?` wildcards) and specify the internal dataset path with `HDF5_DATASET_NAME`. To find the correct dataset path, inspect your file with `h5ls -r yourfile.h5`.
+
+```
+# reconstruct.mrk
+
+DATA_FILE_TEMPLATE /data/experiment/frames.h5
+HDF5_DATASET_NAME /entry/data/data
+XPARM_FILE ../XPARM.XDS
+FIRST_FRAME 1
+LAST_FRAME 3600
+NUMBER_OF_PIXELS 601 601 601
+LOWER_LIMITS -6 -6 -22
+SYMMETRIC_LIMITS
+POLARIZATION_PLANE_NORMAL 1 0 0
+POLARIZATION_FACTOR 0.99
+OUTPUT_FILENAME reconstruction.h5
+MASK masks/mask.h5
+```
+
 ### Configuration keywords
 
 | Keyword | Arguments | Description                                                                                                                                                                              |
 |---|---|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `DATA_FILE_TEMPLATE` | path | Path to raw frames. Replace the frame number with `?` characters, following the XDS convention.                                                                                          |
+| `DATA_FILE_TEMPLATE` | path | Path to raw frames. For CBF files, replace the frame number with `?` characters following the XDS convention. For HDF5 files, provide the file path directly without wildcards.          |
+| `HDF5_DATASET_NAME` | path | Internal HDF5 dataset path to the 3D frame array (e.g. `/entry/data/data`). Required when the input is an HDF5 file. The dataset must have dimensions `[num_frames, height, width]`.    |
 | `XPARM_FILE` | path | Path to `XPARM.XDS` or `GXPARM.XDS` with the crystal orientation matrix determined by XDS.                                                                                               |
 | `FIRST_FRAME` | n | First frame number to reconstruct.                                                                                                                                                       |
 | `LAST_FRAME` | n | Last frame number to reconstruct. Can be omitted.                                                                                                                                        |
